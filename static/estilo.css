@@ -1,0 +1,29 @@
+
+/* index.html */
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+.fondo{
+    background-color: #fc923d;
+    height: 100vh;
+}
+
+.padding{
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.ancho{
+    width: 20%;
+}
+
+#carga{
+    display: none;
+}
+
+/* registrar.html  */
+
+

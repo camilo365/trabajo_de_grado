@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='./estilo.css')}}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+    <div class="fondo">
+        <form method = "post" action="/datos_registrados">
+            <div class="d-flex flex-row-reverse">
+                <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="...">
+            </div>
+            <div>
+                <h5 class = "d-flex justify-content-center ">ingrese informacion solicitada</h5>
+            </div>
+            <div>
+                <img src="{{ url_for('static', filename='imagenes/simulador_de_carga.svg')}}" class="img-fluid mx-auto d-block" alt="...">
+            </div>
+            <div>
+                <h5 class = "d-flex justify-content-center ">amor y cuidado por tu mascota</h5>
+            </div>
+            <div class="mb-3">
+                <input type="text" name="email" id="email_registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="email">
+            </div>
+            <div class = "mb-3">
+                <input type="text" name="usuario_registrar"id="usuario_registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="usuario">
+            </div>
+            <div class = "mb-3">
+                <input type="password" name="password_registrar"id="password_registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="contraseña">
+            </div>
+            <div class = "mb-3">
+                <input type="password" name="confirmar_password"id="confirmar_password" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="confirmar contraseña">
+            </div>
+            <div class = "mb-3">
+                <input type="submit" name="registrar"id="registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" value="registrar">
+            </div>
+            <div class = "mb-3">
+                <input type="submit" name="cancelar"id="cancelar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" value="cancelar">
+            </div>
+        </form>
+    </div>
+</body>
+</html>
