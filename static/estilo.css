@@ -6,9 +6,12 @@ body{
     padding: 0;
 }
 
-.fondo{
+.fondo-color{
     background-color: #fc923d;
-    height: 100vh;
+}
+
+.letra-mediana{
+    font-size: 0.8rem;
 }
 
 .padding{
@@ -22,6 +25,10 @@ body{
 
 #carga{
     display: none;
+}
+
+.alert-dismissible-custom {
+    right: 1rem !important; /* Ajusta el valor según sea necesario */
 }
 
 /* registrar.html  */

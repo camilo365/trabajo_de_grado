@@ -1,0 +1,63 @@
+-- 1 - Crear base de datos (ejecutar solo esa linea).
+
+CREATE DATABASE Id_pets;
+
+-- 2 - Crear tablas en la base de datos 'Id_pets' (posicionarce base de datos 'Id_pets')
+
+-- Estos son comentarios(TODO LO QUE SIGUE A : --). El motor de SQL los ignora.
+
+-- Esta es la tabla que almacenará la información de los usuarios
+CREATE TABLE IF NOT EXISTS usuario_info(
+	identificacion INT(11) PRIMARY KEY,
+    nombre VARCHAR(20) NOT NULL,
+    apellidos VARCHAR(20) NOT NULL,
+    edad INT(3) NOT NULL
+);
+
+-- Esta tabla contendrá la información de contacto de los usuarios
+CREATE TABLE IF NOT EXISTS informacion_contacto(
+	id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    identificacion_usuario INT(11) NOT NULL,
+    detalles_contacto VARCHAR(25) NOT NULL,
+    FOREIGN KEY (identificacion_usuario) REFERENCES usuario_info(identificacion)
+);
+
+-- Esta tabla almacenará la información de las mascotas
+CREATE TABLE IF NOT EXISTS mascotas_info(
+	id_mascota INT(11) PRIMARY KEY AUTO_INCREMENT,
+    id_dueño INT(11) NOT NULL,
+    nombre VARCHAR(20) NOT NULL,
+    edad INT(3) NOT NULL,
+    raza VARCHAR(20) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,	
+    peso INT(3) NOT NULL,
+    vacunado BOOLEAN NOT NULL,
+    FOREIGN KEY(id_dueño) REFERENCES usuario_info(identificacion)
+);
+
+-- Esta tabla registrará los medicamentos de las mascotas
+CREATE TABLE IF NOT EXISTS medicamentos(
+	id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    id_mascota INT(11) NOT NULL,
+    medicamento VARCHAR(20) NOT NULL,
+    FOREIGN KEY(id_mascota) REFERENCES mascotas_info(id_mascota)
+);
+
+
+-- BASE DE DATOS DE LA INFORMACIÓN DE LOS USARIOS
+
+-- 1 - Crear base de datos
+
+CREATE DATABASE usuario_credenciales;
+
+-- 2 - Crear tabla 'credenciales'
+
+-- Esta tabla contendra las credenciales de acceso de los usuarios
+CREATE TABLE IF NOT EXISTS credenciales(
+	id INT(11) PRIMARY KEY AUTO_INCREMENT,
+    usuario VARCHAR(25) NOT NULL,
+    correo VARCHAR(30) NOT NULL,
+    contraseña_hash VARCHAR(162) NOT NULL,
+    salt VARCHAR(20) NOT NULL
+);
+ 

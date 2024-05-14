@@ -1,46 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>REGISTRARCE</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='./estilo.css')}}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="fondo">
-        <form method = "post" action="/datos_registrados">
-            <div class="d-flex flex-row-reverse">
-                <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="...">
-            </div>
-            <div>
-                <h5 class = "d-flex justify-content-center ">ingrese informacion solicitada</h5>
-            </div>
-            <div>
-                <img src="{{ url_for('static', filename='imagenes/simulador_de_carga.svg')}}" class="img-fluid mx-auto d-block" alt="...">
-            </div>
-            <div>
-                <h5 class = "d-flex justify-content-center ">amor y cuidado por tu mascota</h5>
-            </div>
+    <div class="container-fluid fondo-color">
+        <div class="d-flex flex-row-reverse">
+            <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="...">
+        </div>
+        <div>
+            <h4 class="d-flex justify-content-center text-center">Ingrese informacion solicitada</h4>
+        </div>
+        <div>
+            <img src="{{ url_for('static', filename='imagenes/simulador_de_carga.svg')}}" class="img-fluid mx-auto d-block" alt="...">
+        </div>
+        <div>
+            <h4 class ="d-flex justify-content-center text-center">Amor y cuidado por tu mascota</h4>
+        </div>
+
+        <!-- ALERT para mostrar si hay un error -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            
+                {% for message in messages %}
+                <div class="container text-center">
+                    <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
+                        <strong class="text-dark letra-mediana text-start"> {{ message }} </strong>
+                        <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+                {% endfor %}
+            
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{{ url_for('registrar') }}">
             <div class="mb-3">
-                <input type="text" name="email" id="email_registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="email">
+                <input type="text" name="usuario_registrar" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="Nombre de usuario" required autofocus>
             </div>
             <div class = "mb-3">
-                <input type="text" name="usuario_registrar"id="usuario_registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="usuario">
+                <input type="email" name="email" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="Email" required>
             </div>
             <div class = "mb-3">
-                <input type="password" name="password_registrar"id="password_registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="contraseña">
+                <input type="password" name="password_registrar" class="rounded mx-auto d-block p-2  border-0" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Contraseña" required>
             </div>
             <div class = "mb-3">
-                <input type="password" name="confirmar_password"id="confirmar_password" class="rounded mx-auto d-block pr-5 pl-5 pb-2" placeholder="confirmar contraseña">
+                <input type="password" name="confirmar_password" class="rounded mx-auto d-block p-2  border-0" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Confirmar contraseña" required>
             </div>
+            <!-- botones  -->
             <div class = "mb-3">
-                <input type="submit" name="registrar"id="registrar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" value="registrar">
+                <input type="submit" name="btn_registrar" class="rounded mx-auto d-block p-1 border-0" value="REGISTRARCE">
             </div>
+
             <div class = "mb-3">
-                <input type="submit" name="cancelar"id="cancelar" class="rounded mx-auto d-block pr-5 pl-5 pb-2" value="cancelar">
+                <a href="{{url_for('index')}}" class="text-decoration-none"><input type="button" name="btn_cancelar" class="rounded mx-auto d-block p-1  border-0" value="CANCELAR"></a>
             </div>
         </form>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

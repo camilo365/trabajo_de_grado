@@ -1,72 +1,87 @@
-from flask import Flask, render_template, request, redirect ,flash
-import mysql.connector
+from flask import Flask, render_template, request, redirect, flash, url_for
+from flask_login import LoginManager, login_user, logout_user, login_required
+from DB  import *
+
+#Identidades
+from src.modelos.entidades.usuario import User
+
+#Modelos 
+from src.modelos.modeloUsuario import ModeloUsuario
 
 app = Flask(__name__)
 
+login_manager_app = LoginManager(app)
+
+@login_manager_app.user_loader
+def load_user(id):
+    return ModeloUsuario.obtener_usuario(conexion_1, id)
+
 @app.route('/')
-def formulario():
-    return render_template('index.html')
+def index():
+    return render_template('index.html') #Renderiza la landing page
 
-@app.route('/logica', methods=['POST'])
-def home():
-    
-    usuario = request.form['user']
-    contrasena = request.form['password']
-    
-    if usuario ==  "1004995500" and contrasena == "1004995500":
-        conexionbd(usuario,contrasena)       
-        return render_template('prueba.html')
-    else:
-        return render_template('index.html')
+@app.route('/login', methods=['POST', 'GET'])
+def login():
 
-print("credenciales incorrectas")
+    if request.method == 'POST':
+        user = User(usuario=request.form['usuario'], contraseña_hash=request.form['contraseña'])
+        usuario_logiado = ModeloUsuario.login(conexion_1, user)
 
-@app.route('/ventana_registrar', methods=['POST'])
-def registrar():
-    return render_template('registrar.html')
-
-
-@app.route('/datos_registrados', methods=['POST'])
-def datos_registrar():
-    
-    if 'registrar' in request.form:
-        email = request.form['email']
-        usuario = request.form['usuario_registrar']
-        password = request.form['password_registrar']
-        confirmacion_password = request.form['confirmar_password']
-        if email == '' or usuario == '' or password == "" or confirmacion_password == "":
-            flash('complete todos los campos')
-            redirect('/')
+        if usuario_logiado != None:
+            if usuario_logiado.contraseña_hash:
+                login_user(usuario_logiado)
+                return render_template('main.html')
+            else:
+                flash("CONTRASEÑA INCORECTA...")
+                return render_template('login.html')
+        
         else:
-            return email +' '+ usuario +' '+ password +' '+ confirmacion_password
-    else: 
-        return redirect('/')
+            flash("USUARIO NO ENCONTRADO...")
+            return render_template('login.html')
         
+    else:
+        return render_template('login.html')
 
+@app.route('/registrar', methods=['POST', 'GET'])
+def registrar():
 
-def conexionbd(usuario,contraseña):
-    
-    try:
-        conexion = mysql.connector.connect(
-            host = "localhost",
-            user = "root",
-            password = "",
-            database = "proyecto"
-        )
-        if conexion.is_connected():
-            cursor = conexion.cursor()
-            insercion = "INSERT INTO credenciales(user,password) VALUES(%s,%s)"
-            datos = (usuario,contraseña)
-            cursor.execute(insercion,datos)
-            conexion.commit()
-            print("credenciales ingresadas correctamente")
-            cursor.close()
-    
-    except mysql.connector.Error as error:
-        print("Error al conectarse a la base de datos:" , error)
-        
+    if request.method == 'POST':
+        user = User(usuario=request.form['usuario_registrar'], correo=request.form['email'])
+        usuario_registrado = ModeloUsuario.validar_datos(conexion_1, user)
+
+        if usuario_registrado != None:
+            #if usuario_registrado.usuario == request.form['usuario_registrar']:
+            if usuario_registrado == 0:
+                flash("EL USUARIO YA SE ENCUENTRA REGISTRADO...")
+                return render_template('registrar.html')
+            
+            #elif usuario_registrado.usuario == request.form['email']:
+            else:
+                flash("EL CORREO YA SE ENCUENTRA ASOCIADO A UNA CUENTA...")
+                return render_template('registrar.html')
+            
+        else:
+            if request.form['password_registrar'] == request.form['confirmar_password']:
+                
+                usuario = request.form['usuario_registrar'] 
+                correo = request.form['email']
+                salt = User.salt()
+                credenciales = User(usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
+
+                ModeloUsuario.registrar_usuario(conexion_1, credenciales)
+                flash("¡USUARIO REGISTRADO CORRECTAMENTE!")
+                return render_template('login.html')
+            
+            else:
+                flash("LAS CONTRASEÑAS NO COINCIDEN")
+                return render_template('registrar.html')
+    else:
+        return render_template('registrar.html')
+
+@app.route('/tu_familia', methods=['POST', 'GET'])
+def main():
+    return render_template('main.html')
+
 if __name__ == '__main__':
+    app.config['SECRET_KEY'] = '12345678'
     app.run(debug=True)
-    
-    
-    
