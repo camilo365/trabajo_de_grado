@@ -6,3 +6,5 @@ src/modelos/entidades/__pycache__/
 
 static/imagenes/
 Requirements.txt
+API_KEY.py
+DB_codigo.txt

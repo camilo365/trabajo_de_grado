@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tu familia</title>
+    <title>Mi familia</title>
 </head>
 <body>
     <h1> Bienvenido  {{current_user.usuario}} </h1>
+    <a class="btn btn-primary" href="{{url_for('cerrar_sesion')}}"> cerrar_sesion</a>
 </body>
 </html>

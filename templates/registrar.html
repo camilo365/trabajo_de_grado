@@ -10,13 +10,13 @@
 <body>
     <div class="container-fluid fondo-color">
         <div class="d-flex flex-row-reverse">
-            <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="...">
+            <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="Logo Id pets">
         </div>
         <div>
             <h4 class="d-flex justify-content-center text-center">Ingrese informacion solicitada</h4>
         </div>
         <div>
-            <img src="{{ url_for('static', filename='imagenes/simulador_de_carga.svg')}}" class="img-fluid mx-auto d-block" alt="...">
+            <img src="{{ url_for('static', filename='imagenes/simulador_de_carga.svg')}}" class="img-fluid mx-auto d-block" alt="Id pets Imagen 2">
         </div>
         <div>
             <h4 class ="d-flex justify-content-center text-center">Amor y cuidado por tu mascota</h4>
@@ -27,36 +27,37 @@
             {% if messages %}
             
                 {% for message in messages %}
-                <div class="container text-center">
-                    <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
-                        <strong class="text-dark letra-mediana text-start"> {{ message }} </strong>
-                        <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <div class="container text-center">
+                        <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
+                            <strong class="text-dark letra-mediana text-start"> {{ message }} </strong>
+                            <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     </div>
-                </div>
                 {% endfor %}
             
             {% endif %}
         {% endwith %}
 
         <form method="post" action="{{ url_for('registrar') }}">
-            <div class="mb-3">
+            <div class="mb-2">
                 <input type="text" name="usuario_registrar" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="Nombre de usuario" required autofocus>
             </div>
-            <div class = "mb-3">
+            <div class = "mb-2">
+
                 <input type="email" name="email" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="Email" required>
             </div>
-            <div class = "mb-3">
+            <div class = "mb-2">
                 <input type="password" name="password_registrar" class="rounded mx-auto d-block p-2  border-0" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Contraseña" required>
             </div>
-            <div class = "mb-3">
+            <div class = "mb-2">
                 <input type="password" name="confirmar_password" class="rounded mx-auto d-block p-2  border-0" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Confirmar contraseña" required>
             </div>
+
             <!-- botones  -->
             <div class = "mb-3">
                 <input type="submit" name="btn_registrar" class="rounded mx-auto d-block p-1 border-0" value="REGISTRARCE">
             </div>
-
-            <div class = "mb-3">
+            <div class = "mb-2">
                 <a href="{{url_for('index')}}" class="text-decoration-none"><input type="button" name="btn_cancelar" class="rounded mx-auto d-block p-1  border-0" value="CANCELAR"></a>
             </div>
         </form>
