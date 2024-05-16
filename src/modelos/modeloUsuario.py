@@ -8,13 +8,13 @@ class ModeloUsuario():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT id, usuario, correo, contraseña_hash, salt FROM credenciales WHERE usuario=%s", (user.usuario))
+            cursor.execute("SELECT id, usuario, correo, contraseña_hash, salt FROM credenciales WHERE usuario=%s", (user.usuario,))
             datos = cursor.fetchone()
 
             conexion.close()
             cursor.close()
 
-            if datos != None:
+            if datos is not None:
                 return User(id=datos[0], usuario=datos[1], correo=datos[2], contraseña_hash=User.validar_contrasena(datos[3], user.contraseña_hash + datos[4]))
             else:
                 return None
@@ -28,13 +28,13 @@ class ModeloUsuario():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT id, usuario, correo FROM credenciales WHERE usuario=%s", (user.usuario))
+            cursor.execute("SELECT id, usuario, correo FROM credenciales WHERE usuario=%s", (user.usuario,))
             datos = cursor.fetchone()
             
             conexion.close()
             cursor.close()
 
-            if datos != None:
+            if datos is not None:
                 ##return User(id=datos[0], usuario=datos[1], correo=datos[2])
                 if user.usuario == datos[1]: #Usuario ya esta registrado
                     return 0
@@ -70,13 +70,13 @@ class ModeloUsuario():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT id, usuario, correo FROM credenciales WHERE usuario=%s", (id))
+            cursor.execute("SELECT id, usuario, correo FROM credenciales WHERE id=%s", (id,))
             datos = cursor.fetchone()
             
             conexion.close()
             cursor.close()
 
-            if datos != None:
+            if datos is not None:
                 return User(id=datos[0], usuario=datos[1], correo=datos[2])
             else:
                 return None

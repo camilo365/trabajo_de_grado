@@ -4,7 +4,7 @@ import os
 
 class User(UserMixin):
 
-    def __init__(self, id=None, usuario=None, correo=None, contraseña_hash=None,  salt=None, ) -> None:
+    def __init__(self, id=None, usuario=None, correo=None, contraseña_hash=None,  salt=None) -> None:
         self.id = id
         self.usuario = usuario
         self.correo = correo
@@ -20,5 +20,5 @@ class User(UserMixin):
         return os.urandom(10).hex()
 
     @classmethod
-    def incriptar(self, contraseña_hash , salt):
+    def incriptar(self, contraseña_hash, salt):
         return generate_password_hash(contraseña_hash + salt)
