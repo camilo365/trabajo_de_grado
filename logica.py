@@ -47,10 +47,10 @@ def login():
     else:
         return render_template('login.html')
 
-
 """Este se encarga de traer los valores de la plantilla agregar mascota y genera el codigo QR que al ser escaneado 
 redirecciona a las personas a la plantilla mostrardatos que es donde van a estar los datos de forma organizada"""
-@app.route('/qrcode', methods=['POST'])
+
+@app.route('/agregar_familiar', methods=['POST', 'GET'])
 def codigoqr():
     if request.method == 'POST':
         nombremascota = request.form['nombre_mascota']
@@ -63,13 +63,13 @@ def codigoqr():
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
             """ generar la url con los datos dinamicamente """
             data_url = url_for('mostrar_datos', 
-                               nombremascota=nombremascota,
-                               edad=edad,
-                               raza=raza,
-                               fecha_nacimiento=fecha_nacimiento,
-                               peso=peso,
-                               vacunado=vacunado, 
-                               _external=True)
+                                nombremascota=nombremascota,
+                                edad=edad,
+                                raza=raza,
+                                fecha_nacimiento=fecha_nacimiento,
+                                peso=peso,
+                                vacunado=vacunado, 
+                                _external=True)
             # Genera el código QR
             qr = qrcode.QRCode(
                 version=1,
@@ -91,6 +91,10 @@ def codigoqr():
         else:
             flash("Todos los campos son obligatorios")
             return render_template('agregarmascota.html')
+        
+    else:
+        return render_template('agregarmascota.html')
+        
 @app.route('/registrar', methods=['POST', 'GET'])
 def registrar():
     if request.method == 'POST':
@@ -138,17 +142,14 @@ def mostrar_datos():
     
 
     return render_template('mostrardatos.html', 
-                           nombremascota=nombremascota, 
-                           edad=edad, 
-                           raza=raza, 
-                           fecha_nacimiento=fecha_nacimiento, 
-                           peso=peso, 
-                           vacunado=vacunado
-                           )
-    
-@app.route('/agregarmascota', methods=['POST', 'GET'])
-def datosmascotas():
-    return render_template('agregarmascota.html')
+                            nombremascota=nombremascota, 
+                            edad=edad, 
+                            raza=raza, 
+                            fecha_nacimiento=fecha_nacimiento, 
+                            peso=peso, 
+                            vacunado=vacunado
+                            )
+
 
 @app.route('/tu_familia', methods=['POST', 'GET'])
 @login_required
