@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tu familia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='./estilo.css')}}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="fondo-color">
+        <form action = "/qrcode" method = "post">
+            <div>
+                <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="...">
+            </div>
+            <div >
+                <input type="file" name="image">
+            </div>
+            <!-- ALERT para mostrar si hay un error -->
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                
+                    {% for message in messages %}
+                    <div class="container text-center">
+                        <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
+                            <strong class="text-dark"> {{ message }} </strong>
+                            <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                
+                {% endif %}
+            {% endwith %}
+                <div class="mb-3">
+                    <input type="text" name="nombre_mascota" placeholder="nombre_mascota" autocomplete="off" class="rounded mx-auto d-block border col-5">
+                </div>
+                <div class="mb-3">
+                    <input type="text" name="edad" placeholder="edad" autocomplete="off" class="rounded mx-auto d-block border col-5">
+                </div>
+            <div class="mb-3">
+                <input type="text" name="raza" placeholder="raza" autocomplete="off" class="rounded mx-auto d-block border col-5">
+            </div>
+            <div class="mb-3">
+                <input type="date" name="fecha_nacimiento" placeholder="fecha_nacimiento" autocomplete="off" class="rounded mx-auto d-block border col-5">
+            </div>
+            <div class="mb-3">
+                <input type="text" name="peso" placeholder="peso" autocomplete="off" class="rounded mx-auto d-block border col-5">
+            </div>
+            <div class="mb-3">
+                <input type="text" name="vacunado" placeholder="vacunado" autocomplete="off" class="rounded mx-auto d-block border col-5">
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="rounded mx-auto d-block border col-3">enviar</button>
+            </div>
+        </form>
+    </div>
+    <div>
+    </div>
+</body>
+</html>

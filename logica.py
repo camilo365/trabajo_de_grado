@@ -1,5 +1,7 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, send_file
+import qrcode
 from flask_login import LoginManager, login_user, logout_user, login_required
+from io import BytesIO
 from DB  import *
 
 #Identidades
@@ -42,6 +44,50 @@ def login():
     else:
         return render_template('login.html')
 
+
+"""Este se encarga de traer los valores de la plantilla agregar mascota y genera el codigo QR que al ser escaneado 
+redirecciona a las personas a la plantilla mostrardatos que es donde van a estar los datos de forma organizada"""
+@app.route('/qrcode', methods=['POST'])
+def codigoqr():
+    if request.method == 'POST':
+        nombremascota = request.form['nombre_mascota']
+        edad = request.form['edad']
+        raza = request.form['raza']
+        fecha_nacimiento = request.form['fecha_nacimiento']
+        peso = request.form['peso']
+        vacunado = request.form['vacunado']
+
+        if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
+            """ generar la url con los datos dinamicamente """
+            data_url = url_for('mostrar_datos', 
+                               nombremascota=nombremascota,
+                               edad=edad,
+                               raza=raza,
+                               fecha_nacimiento=fecha_nacimiento,
+                               peso=peso,
+                               vacunado=vacunado, 
+                               _external=True)
+            # Genera el código QR
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(data_url)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            """ Guarda la imagen en un buffer de memoria"""
+            img_io = BytesIO()
+            img.save(img_io, 'PNG')
+            img_io.seek(0)
+
+            return send_file(img_io, mimetype='image/png')
+            
+        else:
+            flash("Todos los campos son obligatorios")
+            return render_template('agregarmascota.html')
 @app.route('/registrar', methods=['POST', 'GET'])
 def registrar():
 
@@ -77,6 +123,32 @@ def registrar():
                 return render_template('registrar.html')
     else:
         return render_template('registrar.html')
+    
+"""este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
+persona cuando escanee el codigo"""
+
+@app.route('/mostrardatos',methods = ['POST','GET'])
+def mostrar_datos():
+    nombremascota = request.args.get('nombremascota')
+    edad = request.args.get('edad')
+    raza = request.args.get('raza')
+    fecha_nacimiento = request.args.get('fecha_nacimiento')
+    peso = request.args.get('peso')
+    vacunado = request.args.get('vacunado')
+    
+
+    return render_template('mostrardatos.html', 
+                           nombremascota=nombremascota, 
+                           edad=edad, 
+                           raza=raza, 
+                           fecha_nacimiento=fecha_nacimiento, 
+                           peso=peso, 
+                           vacunado=vacunado
+                           )
+    
+@app.route('/agregarmascota', methods=['POST', 'GET'])
+def datosmascotas():
+    return render_template('agregarmascota.html')
 
 @app.route('/tu_familia', methods=['POST', 'GET'])
 def main():
@@ -84,4 +156,4 @@ def main():
 
 if __name__ == '__main__':
     app.config['SECRET_KEY'] = '12345678'
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
