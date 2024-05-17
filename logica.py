@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, send_file
 import qrcode
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf.csrf import CSRFProtect
 from io import BytesIO
 from DB  import *
@@ -13,7 +13,7 @@ from src.modelos.modeloUsuario import ModeloUsuario
 
 app = Flask(__name__)
 csrf = CSRFProtect()
-app.config['SECRET_KEY'] = 'bed026e0567e203d20527449faf89eb6f503e772dd319622559b31852a7b'
+app.config.from_pyfile('config.py')
 
 login_manager_app = LoginManager(app)
 login_manager_app.login_view = 'login'
@@ -61,6 +61,7 @@ def codigoqr():
         fecha_nacimiento = request.form['fecha_nacimiento']
         peso = request.form['peso']
         vacunado = request.form['vacunado']
+
 
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
             """ generar la url con los datos dinamicamente """
@@ -152,7 +153,6 @@ def mostrar_datos():
                             vacunado=vacunado
                             )
 
-
 @app.route('/tu_familia', methods=['POST', 'GET'])
 @login_required
 def main():
@@ -160,4 +160,4 @@ def main():
 
 if __name__ == '__main__':
     csrf.init_app(app)
-    app.run(debug=True)
+    app.run()
