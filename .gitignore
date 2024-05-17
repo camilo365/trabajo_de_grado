@@ -8,3 +8,4 @@ static/imagenes/
 Requirements.txt
 API_KEY.py
 DB_codigo.txt
+templates/test_unpload.html

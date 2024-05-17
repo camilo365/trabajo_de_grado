@@ -39,6 +39,7 @@
         {% endwith %}
 
         <form method="post" action="{{ url_for('registrar') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-2">
                 <input type="text" name="usuario_registrar" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="Nombre de usuario" required autofocus>
             </div>

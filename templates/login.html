@@ -43,6 +43,7 @@
 
         <!-- ------------------------------------------------------------------------ -->
         <form method="post" action="{{ url_for('login') }}" class="d-flex flex-column">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Token para impedir ataques CSRF -->
             <div class="mb-3"><!-- ------------------------------------------------------------------------ -->
                 <input type="text" name="usuario" placeholder="usuario" autocomplete="off" class="rounded mx-auto d-block border col-7">
             </div>

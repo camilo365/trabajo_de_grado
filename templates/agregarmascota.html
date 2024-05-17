@@ -9,35 +9,35 @@
 </head>
 <body>
     <div class="fondo-color">
-        <form action = "{{url_for('codigoqr')}}" method = "post">
-            <div>
-                <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="...">
+        <div>
+            <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="Logo Id Pets">
+        </div>
+        <!-- ALERT para mostrar si hay un error -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        
+            {% for message in messages %}
+            <div class="container text-center">
+                <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
+                    <strong class="text-dark"> {{ message }} </strong>
+                    <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             </div>
+            {% endfor %}
+        
+            {% endif %}
+        {% endwith %}
+        <form action="{{url_for('codigoqr')}}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div >
                 <input type="file" name="image" class="rounded mx-auto d-block border col-5 mb-2">
             </div>
-            <!-- ALERT para mostrar si hay un error -->
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                
-                    {% for message in messages %}
-                    <div class="container text-center">
-                        <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
-                            <strong class="text-dark"> {{ message }} </strong>
-                            <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                
-                {% endif %}
-            {% endwith %}
-            
-                <div class="mb-3">
-                    <input type="text" name="nombre_mascota" placeholder="nombre_mascota" autocomplete="off" class="rounded mx-auto d-block border col-5">
-                </div>
-                <div class="mb-3">
-                    <input type="text" name="edad" placeholder="edad" autocomplete="off" class="rounded mx-auto d-block border col-5">
-                </div>
+            <div class="mb-3">
+                <input type="text" name="nombre_mascota" placeholder="nombre_mascota" autocomplete="off" class="rounded mx-auto d-block border col-5">
+            </div>
+            <div class="mb-3">
+                <input type="text" name="edad" placeholder="edad" autocomplete="off" class="rounded mx-auto d-block border col-5">
+            </div>
             <div class="mb-3">
                 <input type="text" name="raza" placeholder="raza" autocomplete="off" class="rounded mx-auto d-block border col-5">
             </div>
@@ -51,7 +51,7 @@
                 <input type="text" name="vacunado" placeholder="vacunado" autocomplete="off" class="rounded mx-auto d-block border col-5">
             </div>
             <div class="mb-3">
-                <button type="submit" class="rounded mx-auto d-block border col-3">enviar</button>
+                <button type="submit" class="rounded mx-auto d-block border col-3">Registrar</button>
             </div>
         </form>
     </div>
