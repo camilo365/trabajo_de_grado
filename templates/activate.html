@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Confirmar correo</title>
+</head>
+<body>
+    <h1>Gracias por registrarse. Por favor haga clic en el enlace para confirmar su correo electrónico:</h1>
+    <a href="{{ url_for('confirm_url') }}">Confirmar mi correo</a>
+
+    <h6>Token : {{token}}</h6>
+
+
+</body>
+</html>

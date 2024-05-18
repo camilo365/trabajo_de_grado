@@ -1,9 +1,13 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, send_file
+from flask_babel import Domain
 import qrcode
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_mail import Mail, Message
 from flask_wtf.csrf import CSRFProtect
+from flask_security import Security
+import email_token
+from DB import conexion_1, conexion_2
 from io import BytesIO
-from DB  import *
 
 # Identidades
 from src.modelos.entidades.usuario import User
@@ -13,7 +17,9 @@ from src.modelos.modeloUsuario import ModeloUsuario
 
 app = Flask(__name__)
 csrf = CSRFProtect()
-app.config.from_pyfile('config.py')
+#app.config.from_pyfile('config.py')
+segurity = Security(app)
+mail = Mail(app)
 
 login_manager_app = LoginManager(app)
 login_manager_app.login_view = 'login'
@@ -25,7 +31,34 @@ def load_user(id):
 @app.route('/')
 @app.route('/index')
 def index():
+    
+    token = email_token.generar_token('wa.arias30@ciaf.edu.co', key=app.config['SECRET_KEY'], key2=app.config['SECURITY_PASSWORD_SALT'])
+    #confirmar_url = url_for('confirm_url', token=token, _external=True)
+
+    #html = render_template('activate.html', token=token) #confirmar_url=confirmar_url
+
+    msg = Message(
+        subject="Por favor confirme su correo",
+        recipients=['wa.arias30@ciaf.edu.co'],
+        html=render_template('activate.html', token=token), #body= "f{(http://localhost:5000/confirm/)}",
+        sender=app.config['MAIL_DEFAULT_SENDER']
+    )
+
+    mail.send(msg)
+
     return render_template('index.html')
+
+@app.route('/confirm')
+def confirm_url():
+    print("ESTAMOS EN LA RUTA")
+    #print("token:", token)
+    """ try:
+        email = email_token.confirmar_token(token, key=app.config['SECRET_KEY'], key2=app.config['SECURITY_PASSWORD_SALT'])
+    except:
+        return redirect(url_for('login')) """
+        
+    return redirect(url_for('index'))
+
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -160,4 +193,4 @@ def main():
 
 if __name__ == '__main__':
     csrf.init_app(app)
-    app.run()
+    app.run(debug=True)
