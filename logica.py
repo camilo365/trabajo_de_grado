@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, send_file
-from flask_babel import Domain
+#from flask_babel import Domain
+from config import Config
 import qrcode
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_mail import Mail, Message
@@ -17,7 +18,7 @@ from src.modelos.modeloUsuario import ModeloUsuario
 
 app = Flask(__name__)
 csrf = CSRFProtect()
-#app.config.from_pyfile('config.py')
+app.config.from_object(Config)
 segurity = Security(app)
 mail = Mail(app)
 
@@ -32,33 +33,31 @@ def load_user(id):
 @app.route('/index')
 def index():
     
-    token = email_token.generar_token('wa.arias30@ciaf.edu.co', key=app.config['SECRET_KEY'], key2=app.config['SECURITY_PASSWORD_SALT'])
-    #confirmar_url = url_for('confirm_url', token=token, _external=True)
-
-    #html = render_template('activate.html', token=token) #confirmar_url=confirmar_url
+    token = email_token.generar_token('wa.arias30@ciaf.edu.co', key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
+    confirmar_url = url_for('confirmar_url', token=token, _external=True)
 
     msg = Message(
         subject="Por favor confirme su correo",
         recipients=['wa.arias30@ciaf.edu.co'],
-        html=render_template('activate.html', token=token), #body= "f{(http://localhost:5000/confirm/)}",
-        sender=app.config['MAIL_DEFAULT_SENDER']
+        html=render_template('activate.html', confirmar_url=confirmar_url),
+        sender=Config.MAIL_DEFAULT_SENDER
     )
 
     mail.send(msg)
 
     return render_template('index.html')
 
-@app.route('/confirm')
-def confirm_url():
+@app.route('/confirmar/<token>')
+def confirmar_url(token):
     print("ESTAMOS EN LA RUTA")
-    #print("token:", token)
-    """ try:
-        email = email_token.confirmar_token(token, key=app.config['SECRET_KEY'], key2=app.config['SECURITY_PASSWORD_SALT'])
+    print(token)
+    try:
+        email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
+        print(email)
     except:
-        return redirect(url_for('login')) """
-        
-    return redirect(url_for('index'))
+        return redirect(url_for('index'))
 
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
@@ -130,7 +129,7 @@ def codigoqr():
         
     else:
         return render_template('agregarmascota.html')
-        
+
 @app.route('/registrar', methods=['POST', 'GET'])
 def registrar():
     if request.method == 'POST':
@@ -152,6 +151,7 @@ def registrar():
                 salt = User.salt()
                 credenciales = User(usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
                 ModeloUsuario.registrar_usuario(conexion_1, credenciales)
+
                 flash("¡Usuario registrado correctamente!")
                 return redirect(url_for('login'))
             

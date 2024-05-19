@@ -1,14 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <title>Confirmar correo</title>
+    <meta charset="UTF-8">
+    <title>Confirmación de registro</title>
 </head>
 <body>
-    <h1>Gracias por registrarse. Por favor haga clic en el enlace para confirmar su correo electrónico:</h1>
-    <a href="{{ url_for('confirm_url') }}">Confirmar mi correo</a>
+    <h1>¡Hola {{ usuario }}!</h1>
 
-    <h6>Token : {{token}}</h6>
+    <p>Gracias por unirte a esta familia. Para completar tu registro, haz clic en el siguiente enlace:</p>
 
+    <a href="{{ confirmar_url }}">¡Confirmar mi correo!</a>
 
+    <p>Este enlace caducará en 24 horas.</p>
+
+    <p>Atentamente,</p>
+
+    <p>El equipo de ID Pets</p>
 </body>
 </html>
