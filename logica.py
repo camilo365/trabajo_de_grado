@@ -8,6 +8,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_security import Security
 import email_token
 from DB import conexion_1, conexion_2
+import controlador_db
 from io import BytesIO
 
 # Identidades
@@ -32,22 +33,9 @@ def load_user(id):
 @app.route('/')
 @app.route('/index')
 def index():
-    
-    """ token = email_token.generar_token('jc.correa24@ciaf.edu.co', key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
-    confirmar_url = url_for('confirmar_url', token=token, usuario='manrique', _external=True)
-
-    msg = Message(
-        subject="Por favor confirme su correo",
-        recipients=['jc.correa24@ciaf.edu.co'],
-        html=render_template('activate.html', confirmar_url=confirmar_url),
-        sender=Config.MAIL_DEFAULT_SENDER
-    )
-
-    mail.send(msg) """
-
     return render_template('index.html')
 
-@app.route('/confirmar/<token>/<usuario>')
+@app.route('/confirmar/<token>/<usuario>/')
 def confirmar_url(token, usuario):
     try:
         email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
@@ -68,10 +56,19 @@ def login():
         usuario_logiado = ModeloUsuario.login(conexion_1, user)
 
         if usuario_logiado is not None:
+
             if usuario_logiado.contraseña_hash and usuario_logiado.validado == 1:
-                login_user(usuario_logiado)
-                return redirect(url_for('main'))
-            
+
+                if usuario_logiado.p_completado == 1:
+
+                    login_user(usuario_logiado)
+                    return redirect(url_for('main'))
+
+                else:
+                    login_user(usuario_logiado)
+                    correo = usuario_logiado.correo
+                    return redirect(url_for('completar_registro', correo=correo))
+
             elif usuario_logiado.validado == 0:
                 flash("Debe verificar su cuenta. Para poder iniciar sesión")
                 return render_template('login.html')
@@ -174,6 +171,23 @@ def registrar():
     else:
         return render_template('registrar.html')
 
+@app.route('/completar_registro/<correo>/', methods=['POST', 'GET'])
+def completar_registro(correo):
+    if request.method == 'POST':
+        identificacion = request.form['identificacion']
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        edad = request.form['edad']
+        correo = request.form['correo']
+
+        controlador_db.agregar_info_usuario(conexion_2, identificacion, correo, nombre, apellido, edad)
+        ModeloUsuario.validar_p_completado(conexion_1, correo) #consulta para modificar la variable : p_completado.
+        return redirect(url_for('main'))
+
+    else:
+        flash('Complete todos los campos para poder continuar', 'succes')
+        return render_template('completar_registro.html', correo=correo)
+
 """este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
 persona cuando escanee el codigo"""
 
@@ -195,6 +209,13 @@ def mostrar_datos():
                             peso=peso, 
                             vacunado=vacunado
                             )
+
+@app.route('/cerrar_sesion')
+@login_required
+def logout():
+    logout_user()
+    flash('Has cerrado sesión exitosamente.', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/tu_familia', methods=['POST', 'GET'])
 @login_required

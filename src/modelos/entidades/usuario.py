@@ -4,13 +4,14 @@ import os
 
 class User(UserMixin):
 
-    def __init__(self, id=None, usuario=None, correo=None, validado=0, contraseña_hash=None,  salt=None) -> None:
+    def __init__(self, id=None, usuario=None, correo=None, validado=0, contraseña_hash=None,  salt=None, p_completado=0) -> None:
         self.id = id
         self.usuario = usuario
         self.correo = correo
         self.validado = validado
         self.contraseña_hash = contraseña_hash #Contraseña almacenada en la base de datos
         self.salt = salt
+        self.p_completado = p_completado
 
     @classmethod
     def validar_contrasena(self, contraseña_hash, contrasena):
