@@ -33,29 +33,31 @@ def load_user(id):
 @app.route('/index')
 def index():
     
-    token = email_token.generar_token('wa.arias30@ciaf.edu.co', key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
-    confirmar_url = url_for('confirmar_url', token=token, _external=True)
+    """ token = email_token.generar_token('jc.correa24@ciaf.edu.co', key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
+    confirmar_url = url_for('confirmar_url', token=token, usuario='manrique', _external=True)
 
     msg = Message(
         subject="Por favor confirme su correo",
-        recipients=['wa.arias30@ciaf.edu.co'],
+        recipients=['jc.correa24@ciaf.edu.co'],
         html=render_template('activate.html', confirmar_url=confirmar_url),
         sender=Config.MAIL_DEFAULT_SENDER
     )
 
-    mail.send(msg)
+    mail.send(msg) """
 
     return render_template('index.html')
 
-@app.route('/confirmar/<token>')
-def confirmar_url(token):
-    print("ESTAMOS EN LA RUTA")
-    print(token)
+@app.route('/confirmar/<token>/<usuario>')
+def confirmar_url(token, usuario):
     try:
         email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
-        print(email)
+        if email:
+            ModeloUsuario.validar_registro(conexion_1, usuario)
+        else:
+            flash('El enlace de confirmación es inválido o ha expirado.', 'danger')
+            return redirect(url_for('login'))
     except:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
 
     return redirect(url_for('login'))
 
@@ -66,10 +68,14 @@ def login():
         usuario_logiado = ModeloUsuario.login(conexion_1, user)
 
         if usuario_logiado is not None:
-            if usuario_logiado.contraseña_hash:
+            if usuario_logiado.contraseña_hash and usuario_logiado.validado == 1:
                 login_user(usuario_logiado)
                 return redirect(url_for('main'))
             
+            elif usuario_logiado.validado == 0:
+                flash("Debe verificar su cuenta. Para poder iniciar sesión")
+                return render_template('login.html')
+
             else:
                 flash("Contraseña incorrecta.")
                 return render_template('login.html')
@@ -136,34 +142,38 @@ def registrar():
         user = User(usuario=request.form['usuario_registrar'], correo=request.form['email'])
         usuario_registrado = ModeloUsuario.validar_datos(conexion_1, user)
 
-        if usuario_registrado is not None and request.form['password_registrar'] == request.form['confirmar_password']:
+        if usuario_registrado is not None:
             if usuario_registrado == 0:
                 flash("El usuario ya se encuentra registrado.")
                 return render_template('registrar.html')
             
-            elif usuario_registrado == 1:
+            else:
                 flash("El correo ya se encuentra asociado a una cuenta.")
                 return render_template('registrar.html')
-            
-            else:
-                usuario = request.form['usuario_registrar']
-                correo = request.form['email']
-                salt = User.salt()
-                credenciales = User(usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
-                ModeloUsuario.registrar_usuario(conexion_1, credenciales)
 
-                flash("¡Usuario registrado correctamente!")
-                return redirect(url_for('login'))
-            
-        else:
+        elif request.form['password_registrar'] != request.form['confirmar_password']:
             flash("Las contraseñas no coinciden.")
-    
             return render_template('registrar.html')
         
+        else:
+            usuario = request.form['usuario_registrar']
+            correo = request.form['email']
+            salt = User.salt()
+            credenciales = User(usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
+
+            if email_token.enviar_correo_confirmacion(mail, Config.SECRET_KEY, Config.SECURITY_PASSWORD_SALT, usuario=usuario, correo=correo):
+                flash('Usuario registrado exitosamente. Se envio un enlace de confirmación a su correo')
+                ModeloUsuario.registrar_usuario(conexion_1, credenciales) 
+                return redirect(url_for('login'))
+            
+            else:
+                flash('Ocurrio un error inesperado. Intentelo de nuevo')
+                return redirect(url_for('index'))
+
     #Si la petición es GET
     else:
         return render_template('registrar.html')
-    
+
 """este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
 persona cuando escanee el codigo"""
 
