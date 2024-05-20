@@ -9,6 +9,7 @@ CREATE DATABASE Id_pets;
 -- Esta es la tabla que almacenará la información de los usuarios
 CREATE TABLE IF NOT EXISTS usuario_info(
 	identificacion INT(11) PRIMARY KEY,
+    correo VARCHAR(30) NOT NULL,
     nombre VARCHAR(20) NOT NULL,
     apellidos VARCHAR(20) NOT NULL,
     edad INT(3) NOT NULL
@@ -57,6 +58,7 @@ CREATE TABLE IF NOT EXISTS credenciales(
 	id INT(11) PRIMARY KEY AUTO_INCREMENT,
     usuario VARCHAR(25) NOT NULL,
     correo VARCHAR(30) NOT NULL,
+    validado BOOLEAN(1) NOT NULL,
     contraseña_hash VARCHAR(162) NOT NULL,
     salt VARCHAR(20) NOT NULL
 );

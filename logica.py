@@ -1,10 +1,17 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, send_file
+#from flask_babel import Domain
+from config import Config
 import qrcode
-from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_mail import Mail, Message
 from flask_wtf.csrf import CSRFProtect
-from io import BytesIO
-from DB  import *
+from flask_security import Security
+import email_token
+from DB import conexion_1, conexion_2
 import os
+import controlador_db
+from io import BytesIO
+
 # Identidades
 from src.modelos.entidades.usuario import User
 
@@ -13,7 +20,9 @@ from src.modelos.modeloUsuario import ModeloUsuario
 
 app = Flask(__name__)
 csrf = CSRFProtect()
-app.config['SECRET_KEY'] = 'bed026e0567e203d20527449faf89eb6f503e772dd319622559b31852a7b'
+app.config.from_object(Config)
+segurity = Security(app)
+mail = Mail(app)
 
 login_manager_app = LoginManager(app)
 login_manager_app.login_view = 'login'
@@ -27,6 +36,20 @@ def load_user(id):
 def index():
     return render_template('index.html')
 
+@app.route('/confirmar/<token>/<usuario>/')
+def confirmar_url(token, usuario):
+    try:
+        email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
+        if email:
+            ModeloUsuario.validar_registro(conexion_1, usuario)
+        else:
+            flash('El enlace de confirmación es inválido o ha expirado.', 'danger')
+            return redirect(url_for('login'))
+    except:
+        return redirect(url_for('login'))
+
+    return redirect(url_for('login'))
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -34,10 +57,23 @@ def login():
         usuario_logiado = ModeloUsuario.login(conexion_1, user)
 
         if usuario_logiado is not None:
-            if usuario_logiado.contraseña_hash:
-                login_user(usuario_logiado)
-                return redirect(url_for('main'))
-            
+
+            if usuario_logiado.contraseña_hash and usuario_logiado.validado == 1:
+
+                if usuario_logiado.p_completado == 1:
+
+                    login_user(usuario_logiado)
+                    return redirect(url_for('main'))
+
+                else:
+                    login_user(usuario_logiado)
+                    correo = usuario_logiado.correo
+                    return redirect(url_for('completar_registro', correo=correo))
+
+            elif usuario_logiado.validado == 0:
+                flash("Debe verificar su cuenta. Para poder iniciar sesión")
+                return render_template('login.html')
+
             else:
                 flash("Contraseña incorrecta.")
                 return render_template('login.html')
@@ -61,6 +97,7 @@ def codigoqr():
         fecha_nacimiento = request.form['fecha_nacimiento']
         peso = request.form['peso']
         vacunado = request.form['vacunado']
+
 
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
             """ generar la url con los datos dinamicamente """
@@ -112,40 +149,62 @@ def codigoqr():
         
     else:
         return render_template('agregarmascota.html')
-        
+
 @app.route('/registrar', methods=['POST', 'GET'])
 def registrar():
     if request.method == 'POST':
         user = User(usuario=request.form['usuario_registrar'], correo=request.form['email'])
         usuario_registrado = ModeloUsuario.validar_datos(conexion_1, user)
 
-        if usuario_registrado is not None and request.form['password_registrar'] == request.form['confirmar_password']:
+        if usuario_registrado is not None:
             if usuario_registrado == 0:
                 flash("El usuario ya se encuentra registrado.")
                 return render_template('registrar.html')
             
-            elif usuario_registrado == 1:
+            else:
                 flash("El correo ya se encuentra asociado a una cuenta.")
                 return render_template('registrar.html')
-            
-            else:
-                usuario = request.form['usuario_registrar']
-                correo = request.form['email']
-                salt = User.salt()
-                credenciales = User(usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
-                ModeloUsuario.registrar_usuario(conexion_1, credenciales)
-                flash("¡Usuario registrado correctamente!")
-                return redirect(url_for('login'))
-            
-        else:
+
+        elif request.form['password_registrar'] != request.form['confirmar_password']:
             flash("Las contraseñas no coinciden.")
-    
             return render_template('registrar.html')
         
+        else:
+            usuario = request.form['usuario_registrar']
+            correo = request.form['email']
+            salt = User.salt()
+            credenciales = User(usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
+
+            if email_token.enviar_correo_confirmacion(mail, Config.SECRET_KEY, Config.SECURITY_PASSWORD_SALT, usuario=usuario, correo=correo):
+                flash('Usuario registrado exitosamente. Se envio un enlace de confirmación a su correo')
+                ModeloUsuario.registrar_usuario(conexion_1, credenciales) 
+                return redirect(url_for('login'))
+            
+            else:
+                flash('Ocurrio un error inesperado. Intentelo de nuevo')
+                return redirect(url_for('index'))
+
     #Si la petición es GET
     else:
         return render_template('registrar.html')
-    
+
+@app.route('/completar_registro/<correo>/', methods=['POST', 'GET'])
+def completar_registro(correo):
+    if request.method == 'POST':
+        identificacion = request.form['identificacion']
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        edad = request.form['edad']
+        correo = request.form['correo']
+
+        controlador_db.agregar_info_usuario(conexion_2, identificacion, correo, nombre, apellido, edad)
+        ModeloUsuario.validar_p_completado(conexion_1, correo) #consulta para modificar la variable : p_completado.
+        return redirect(url_for('main'))
+
+    else:
+        flash('Complete todos los campos para poder continuar', 'succes')
+        return render_template('completar_registro.html', correo=correo)
+
 """este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
 persona cuando escanee el codigo"""
 
@@ -186,6 +245,12 @@ def main_redireccionar():
     return render_template('agregarmascota.html',)
     
 
+@app.route('/cerrar_sesion')
+@login_required
+def logout():
+    logout_user()
+    flash('Has cerrado sesión exitosamente.', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/tu_familia', methods=['POST', 'GET'])
 @login_required
