@@ -4,7 +4,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_wtf.csrf import CSRFProtect
 from io import BytesIO
 from DB  import *
-
+import os
 # Identidades
 from src.modelos.entidades.usuario import User
 
@@ -82,17 +82,33 @@ def codigoqr():
             qr.add_data(data_url)
             qr.make(fit=True)
             img = qr.make_image(fill_color="black", back_color="white")
+            """ """ # Guarda la imagen en una carpeta estática
+            img_path = os.path.join('static', 'qrcodes', f'{nombremascota}.png')
+            img.save(img_path)
 
-            """ Guarda la imagen en un buffer de memoria"""
-            img_io = BytesIO()
+            # Generar la URL para la imagen
+            img_url = url_for('static', filename=f'qrcodes/{nombremascota}.png')
+
+            return render_template('main.html', 
+                                   img_url=img_url, 
+                                   nombremascota=nombremascota, 
+                                   edad=edad, 
+                                   raza=raza, 
+                                   fecha_nacimiento=fecha_nacimiento, 
+                                   peso=peso, 
+                                   vacunado=vacunado)
+
+            """ Guarda la imagen en un buffer de memoria""" 
+            """ img_io = BytesIO()
             img.save(img_io, 'PNG')
             img_io.seek(0)
 
-            return send_file(img_io, mimetype='image/png')
+            return send_file(img_io, mimetype='image/png') """
             
         else:
             flash("Todos los campos son obligatorios")
             return render_template('agregarmascota.html')
+         
         
     else:
         return render_template('agregarmascota.html')
@@ -135,7 +151,20 @@ persona cuando escanee el codigo"""
 
 @app.route('/mostrardatos',methods = ['POST','GET'])
 def mostrar_datos():
-    nombremascota = request.args.get('nombremascota')
+    datos = {
+        'nombremascota' : request.args.get('nombremascota'),
+        'edad' : request.args.get('edad'),
+        'raza' : request.args.get('raza'),
+        'fecha_nacimiento' : request.args.get('fecha_nacimiento'),
+        'peso' : request.args.get('peso'),
+        'vacunado' : request.args.get('vacunado'),
+    }
+    "flash datos obtenidos  correctamente"
+    return render_template('mostrardatos.html', **datos)    
+
+    """ se puede manejar de esta forma o de la otra de arriba como diccionario """
+    
+    """ nombremascota = request.args.get('nombremascota')
     edad = request.args.get('edad')
     raza = request.args.get('raza')
     fecha_nacimiento = request.args.get('fecha_nacimiento')
@@ -150,7 +179,12 @@ def mostrar_datos():
                             fecha_nacimiento=fecha_nacimiento, 
                             peso=peso, 
                             vacunado=vacunado
-                            )
+                            ) """
+
+@app.route('/main', methods=['POST', 'GET'])
+def main_redireccionar():
+    return render_template('agregarmascota.html',)
+    
 
 
 @app.route('/tu_familia', methods=['POST', 'GET'])
@@ -160,4 +194,4 @@ def main():
 
 if __name__ == '__main__':
     csrf.init_app(app)
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')

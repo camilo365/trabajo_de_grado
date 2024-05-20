@@ -8,7 +8,7 @@ body{
 
 .fondo-color{
     background-color: #fc923d;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 .letra-mediana{
@@ -35,3 +35,33 @@ body{
 /* registrar.html  */
 
 
+.modal-foto{
+    background-image: url(../static/imagenes/huellas.png);
+    background-size: cover; /* Ajusta la imagen para cubrir todo el contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-position: center; /* Centra la imagen */
+    width: 60vw;
+    height: 25vh;
+    opacity: 0.5;
+    overflow: auto;
+}
+#modal-registros{
+    background-color: rgb(215, 190, 157);
+    background-size: cover; /* Ajusta la imagen para cubrir todo el contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-position: center; /* Centra la imagen */
+    width: 60vw;
+    height: 25vh;
+    opacity: 0.5;
+    overflow: auto;
+    display: none;
+    justify-content: start;
+}
+
+#table_info{
+    display: flex;
+}
+
+#ocultar{
+    display: block;
+}

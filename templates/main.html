@@ -4,8 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>tu familia</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='./estilo.css')}}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1> Bienvenido  {{current_user.usuario}} </h1>
+    <form action="{{url_for('main_redireccionar')}}" method="get">
+    <div class="fondo-color">
+        <a href="/" class="btn btn-secondary align-end">Cerrar Sesion</a>
+            <div class="modal-foto mx-auto rounded">
+            </div>
+            <div class="d-flex justify-content-center">
+                <input type="submit" id="ventanaagregar" name="añadir integrante a la familia" value="añadir integrante a la familia">
+            </div>
+    </form>
+    <div class ="fondo-color">
+        <div >
+            <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="...">
+        </div>
+        <div>
+            <img src="{{ url_for('static', filename='imagenes/hueso.svg')}}" class="img-fluid mx-auto d-block" alt="...">
+        </div>
+        <div>
+            <img src="{{ url_for('static', filename='imagenes/slogan.svg')}}" class="img-fluid mx-auto d-block" alt="...">
+        </div>
+        <div id="contqrimage">
+            {% if img_url %}
+                <img id="qrImage" class="mx-auto d-block{% if ocultar_qr %} d-none{% endif %}" src="{{ img_url }}" alt="QR Code" width="20%">
+                <div class="text-center">
+                </div>
+                {% endif %}
+        </div>
+        <div id="contqrimage" class="text-center mt-3">
+            {% if img_url %}
+                <a onclick="metodo()" href="{{ img_url }}" download="qrcode.png" class="btn btn-primary">Descargar Imagen</a>
+            {% endif %}
+        </div>
+        <div id="modal-registros" class="mx-auto rounded">
+            <div class="row">
+                <div class="col-md-6 mt-4">
+                    <img src="{{ url_for('static', filename='imagenes/perrito.jpg')}}" class="img-fluid mx-auto d-block" alt="...">
+                </div>
+                <div class="col-md-6 mt-4">
+                    <div class="row">
+                        <div class="col">
+                            <strong>Nombre:</strong> {{nombremascota}}
+                        </div>
+                        <div class="col">
+                            <strong>Edad:</strong> {{edad}}
+                        </div>
+                        <div class="col">
+                            <strong>Raza:</strong> {{raza}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <strong>Nacimiento:</strong> {{fecha_nacimiento}}
+                        </div>
+                        <div class="col">
+                            <strong>Peso:</strong> {{peso}}
+                        </div>
+                        <div class="col">
+                            <strong>Vacunado:</strong> {{vacunado}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col mx-auto d-flex justify-content-center">
+                    <input  type="submit" value="EDITAR" class="btn btn-primary btn-block mx-auto">
+                </div>
+                <div class="col mx-auto d-flex justify-content-center">
+                    <input type="submit" value="ELIMINAR" class="btn btn-danger btn-block mx-auto">
+                </div>
+            </div>
+        </div>
+        
+        
+        <script src="{{ url_for('static', filename='js/efectos.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
