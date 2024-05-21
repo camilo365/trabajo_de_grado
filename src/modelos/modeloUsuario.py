@@ -10,12 +10,11 @@ class ModeloUsuario():
 
             cursor.execute("SELECT id, usuario, correo, validado, contraseña_hash, salt, p_completado FROM credenciales WHERE usuario=%s", (user.usuario,))
             datos = cursor.fetchone()
-
             conexion.close()
             cursor.close()
 
             if datos is not None:
-                return User(id=datos[0], usuario=datos[1], correo=datos[2], validado=datos[3], contraseña_hash=User.validar_contrasena(datos[4], user.contraseña_hash + datos[5]), p_completado=[6])
+                return User(id=datos[0], usuario=datos[1], correo=datos[2], validado=datos[3], contraseña_hash=User.validar_contrasena(datos[4], user.contraseña_hash + datos[5]), p_completado=datos[6])
             else:
                 return None
             
@@ -54,7 +53,7 @@ class ModeloUsuario():
 
             cursor = conexion.cursor()
 
-            cursor.execute("INSERT INTO credenciales(usuario, correo, validado, contraseña_hash, salt) VALUES (%s, %s, %s, %s, %s)", (user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt))
+            cursor.execute("INSERT INTO credenciales(usuario, correo, validado, contraseña_hash, salt, p_completado) VALUES (%s, %s, %s, %s, %s)", (user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt, user.p_completado))
 
             cursor.close()
 
