@@ -34,8 +34,7 @@ class ModeloUsuario():
             cursor.close()
 
             if datos is not None:
-                ##return User(id=datos[0], usuario=datos[1], correo=datos[2])
-                if user.usuario == datos[1]: #Usuario ya esta registrado
+                if user.usuario == datos[1]: #datos[1] es el usuario
                     return 0
                 else:
                     return 1 #El correo ya esta registrado
@@ -99,7 +98,7 @@ class ModeloUsuario():
 
         except Exception as ex:
             raise Exception(ex)
-        
+
     @classmethod
     def validar_p_completado(self, db, correo): #Función para validar que el usuario completo su perfil
         """ Valida Que el usuario haya completado su registro """
@@ -114,5 +113,25 @@ class ModeloUsuario():
             conexion.close()
             cursor.close()
 
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
+    def cambiar_contraseña(self, db, contraseña, usuario):
+        try:
+            conexion = db()
+            cursor = conexion.cursor()
+
+            salt = User.salt()
+            contraseña_hash = User.incriptar(contraseña, salt)
+
+            cursor.execute("UPDATE credenciales SET contraseña_hash=%s, salt=%s WHERE usuario=%s", (contraseña_hash, salt, usuario))
+
+            """ UPDATE `credenciales` SET `contraseña_hash` = 'scrypt:32768:8:1$gL0mktzQ4xJL4j0F$957e47d3c86d4c36', `salt` = 'c3b889ae11b' WHERE `credenciales`.`id` = 10; """
+            
+            conexion.commit()
+            conexion.close()
+            cursor.close()
+            
         except Exception as ex:
             raise Exception(ex)

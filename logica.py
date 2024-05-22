@@ -39,7 +39,7 @@ def index():
 @app.route('/confirmar/<token>/<usuario>/')
 def confirmar_url(token, usuario):
     try:
-        email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT)
+        email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT, expiration=86400)
         if email:
             ModeloUsuario.validar_registro(conexion_1, usuario)
         else:
@@ -149,8 +149,7 @@ def codigoqr():
         else:
             flash("Todos los campos son obligatorios")
             return render_template('agregarmascota.html')
-         
-        
+
     else:
         return render_template('agregarmascota.html')
 
@@ -164,7 +163,7 @@ def registrar():
             if usuario_registrado == 0:
                 flash("El usuario ya se encuentra registrado.")
                 return render_template('registrar.html')
-            
+
             else:
                 flash("El correo ya se encuentra asociado a una cuenta.")
                 return render_template('registrar.html')
@@ -172,7 +171,7 @@ def registrar():
         elif request.form['password_registrar'] != request.form['confirmar_password']:
             flash("Las contraseñas no coinciden.")
             return render_template('registrar.html')
-        
+
         else:
             usuario = request.form['usuario_registrar']
             correo = request.form['email']
@@ -206,8 +205,28 @@ def completar_registro(correo):
         return redirect(url_for('main'))
 
     else:
-        flash('Complete todos los campos para poder continuar', 'succes')
+        flash('Complete todos los campos para poder continuar', 'danger')
         return render_template('completar_registro.html', correo=correo)
+
+@app.route('/restablecer/<token>/', methods=['POSt', 'GET'])
+def restablecer_contrasena(token):
+    if request.method == 'GET':
+        try:
+            email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT, expiration=300)
+            if email: #La confirmación del token fue correcta
+                return render_template('cambiar_contraseña.html') #Falta crear la plantila
+
+            else:
+                flash('El enlace de confirmación es inválido o ha expirado.', 'danger')
+                return redirect(url_for('login'))
+        except:
+            flash('Ocurrio un error inexperado. Intentelo de nuevo', 'danger')
+            return redirect(url_for('login'))
+        
+    #Si la petición es POST
+    else:
+        #Falta desarollar la función para cambiar la contraseña
+        return redirect(url_for('login'))
 
 """este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
 persona cuando escanee el codigo"""
@@ -247,7 +266,6 @@ def mostrar_datos():
 @app.route('/main', methods=['POST', 'GET'])
 def main_redireccionar():
     return render_template('agregarmascota.html',)
-    
 
 @app.route('/cerrar_sesion')
 @login_required
@@ -258,6 +276,7 @@ def logout():
 @app.route('/tu_familia', methods=['POST', 'GET'])
 @login_required
 def main():
+
     return render_template('main.html')
 
 if __name__ == '__main__':
