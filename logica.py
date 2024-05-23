@@ -62,25 +62,29 @@ def login():
 
         if usuario_logiado is not None:
 
-            if usuario_logiado.contraseña_hash and usuario_logiado.validado == 1:
+            if usuario_logiado.contraseña_hash:
 
-                if usuario_logiado.p_completado == 1:
+                if usuario_logiado.validado == 1: #true
 
-                    login_user(usuario_logiado)
-                    return redirect(url_for('main'))
+                    if usuario_logiado.p_completado == 1: #true
+
+                        login_user(usuario_logiado)
+                        return redirect(url_for('main'))
+
+                    else:
+                        login_user(usuario_logiado)
+                        correo = usuario_logiado.correo
+                        return redirect(url_for('completar_registro', correo=correo))
 
                 else:
-                    login_user(usuario_logiado)
-                    correo = usuario_logiado.correo
-                    return redirect(url_for('completar_registro', correo=correo))
+                    flash("Debe verificar su cuenta. Para poder iniciar sesión")
+                    return render_template('login.html')
+                    
 
-            elif usuario_logiado.validado == 0:
-                flash("Debe verificar su cuenta. Para poder iniciar sesión")
-                return render_template('login.html')
-
-            else:
+            elif usuario_logiado.contraseña_hash is not True:
                 flash("Contraseña incorrecta.")
                 return render_template('login.html')
+
         else:
             flash('El usuario no se encuentra registrado.')
             return render_template('login.html')
@@ -253,7 +257,6 @@ def main_redireccionar():
 @login_required
 def logout():
     logout_user()
-    flash('Has cerrado sesión exitosamente.', 'success')
     return redirect(url_for('index'))
 
 @app.route('/tu_familia', methods=['POST', 'GET'])

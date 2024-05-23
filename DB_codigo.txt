@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS credenciales(
     correo VARCHAR(30) NOT NULL,
     validado BOOLEAN(1) NOT NULL,
     contraseña_hash VARCHAR(162) NOT NULL,
-    salt VARCHAR(20) NOT NULL
+    salt VARCHAR(20) NOT NULL,
+    p_completado(1) NOT NULL
 );
  
