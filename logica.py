@@ -36,6 +36,10 @@ def load_user(id):
 def index():
     return render_template('index.html')
 
+@app.route('/recuperar_contraseña',methods=['POST','GET'])
+def recuperar_contraseña():
+    return render_template('Recuperar_Contraseña.html')
+
 @app.route('/confirmar/<token>/<usuario>/')
 def confirmar_url(token, usuario):
     try:
