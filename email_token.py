@@ -1,6 +1,6 @@
 from flask import render_template, url_for
 from itsdangerous import URLSafeTimedSerializer
-from flask_mail import Mail, Message 
+from flask_mail import  Message 
 from config import Config
 
 #Generar token de confirmación
@@ -38,13 +38,13 @@ def enviar_correo_confirmacion(mail, key, key2, usuario=None, correo=None):
 #Enviar correo para recuperar contraseña
 def enviar_correo_recuperacion(mail, key, key2, correo=None):
     token = generar_token(email=correo, key=key, key2=key2)
-    confirmar_url = url_for('restablecer_contrasena', token=token, _external=True)
+    restablecer_contraseña = url_for('restablecer_contraseña', token=token, correo=correo, _external=True)
 
     try:
         msg = Message(
             subject="Restablecer contraseña",
             recipients=[correo],
-            html=render_template('restablecer.html', confirmar_url=confirmar_url),
+            html=render_template('restablecer.html', restablecer_contraseña=restablecer_contraseña, correo=correo),
             sender=Config.MAIL_DEFAULT_SENDER
         )
 

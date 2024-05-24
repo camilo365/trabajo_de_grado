@@ -52,7 +52,7 @@ class ModeloUsuario():
 
             cursor = conexion.cursor()
 
-            cursor.execute("INSERT INTO credenciales(usuario, correo, validado, contraseña_hash, salt, p_completado) VALUES (%s, %s, %s, %s, %s)", (user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt, user.p_completado))
+            cursor.execute("INSERT INTO credenciales(usuario, correo, validado, contraseña_hash, salt, p_completado) VALUES (%s, %s, %s, %s, %s, %s)", (user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt, user.p_completado))
 
             cursor.close()
 
@@ -64,6 +64,7 @@ class ModeloUsuario():
 
     @classmethod
     def obtener_usuario(self, db, id):
+
         try:
             conexion = db()
             cursor = conexion.cursor()
@@ -79,6 +80,47 @@ class ModeloUsuario():
             else:
                 return None
             
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def obtener_info_usuario(self, db, correo_usuario):
+        try:
+            conexion = db()
+            cursor = conexion.cursor()
+
+            cursor.execute("SELECT identificacion FROM usuario_info WHERE correo = %s", (correo_usuario,))
+
+            datos = cursor.fetchone()
+
+            conexion.close()
+            cursor.close()
+
+            if datos is not None:
+                return datos
+            else:
+                return None
+
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def obtener_correo_usuario(self, db, correo): #Verificar si el correo existe
+        try:
+            conexion = db()
+            cursor = conexion.cursor()
+
+            cursor.execute("SELECT EXISTS (SELECT 1 FROM credenciales WHERE correo=%s)", (correo,))
+            datos = cursor.fetchone()[0]
+
+            conexion.close()
+            cursor.close()
+
+            if datos is not None:
+                return datos
+            else:
+                return None
+
         except Exception as ex:
             raise Exception(ex)
 
@@ -117,7 +159,7 @@ class ModeloUsuario():
             raise Exception(ex)
         
     @classmethod
-    def cambiar_contraseña(self, db, contraseña, usuario):
+    def cambiar_contraseña(self, db, contraseña, correo):
         try:
             conexion = db()
             cursor = conexion.cursor()
@@ -125,10 +167,8 @@ class ModeloUsuario():
             salt = User.salt()
             contraseña_hash = User.incriptar(contraseña, salt)
 
-            cursor.execute("UPDATE credenciales SET contraseña_hash=%s, salt=%s WHERE usuario=%s", (contraseña_hash, salt, usuario))
+            cursor.execute("UPDATE credenciales SET contraseña_hash=%s, salt=%s WHERE correo=%s", (contraseña_hash, salt, correo))
 
-            """ UPDATE `credenciales` SET `contraseña_hash` = 'scrypt:32768:8:1$gL0mktzQ4xJL4j0F$957e47d3c86d4c36', `salt` = 'c3b889ae11b' WHERE `credenciales`.`id` = 10; """
-            
             conexion.commit()
             conexion.close()
             cursor.close()

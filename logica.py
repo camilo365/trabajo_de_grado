@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for, sen
 from config import Config
 import qrcode
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_mail import Mail, Message
+from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from flask_security import Security
 import email_token
@@ -17,6 +17,7 @@ from src.modelos.entidades.usuario import User
 
 # Modelos 
 from src.modelos.modeloUsuario import ModeloUsuario
+from src.modelos.modeloMascota import ModeloMascota
 
 app = Flask(__name__)
 csrf = CSRFProtect()
@@ -35,6 +36,25 @@ def load_user(id):
 @app.route('/index')
 def index():
     return render_template('index.html')
+
+@app.route('/recuperar_contraseña', methods=['POST','GET'])
+def recuperar_contraseña():
+    if request.method == 'POST':
+
+        correo = request.form['correo']
+
+        if ModeloUsuario.obtener_correo_usuario(conexion_1, correo) == 1:
+            email_token.enviar_correo_recuperacion(mail, Config.SECRET_KEY, Config.SECURITY_PASSWORD_SALT, correo)
+
+            flash('Se envio un enlace de recuperación al correo')
+            return redirect(url_for('login'))
+
+        else:
+            flash('El correo no se encuentra registrado')
+            return render_template('Recuperar_Contraseña.html')
+
+    else:
+        return render_template('Recuperar_Contraseña.html')
 
 @app.route('/confirmar/<token>/<usuario>/')
 def confirmar_url(token, usuario):
@@ -93,6 +113,7 @@ def login():
 redirecciona a las personas a la plantilla mostrardatos que es donde van a estar los datos de forma organizada"""
 
 @app.route('/agregar_familiar', methods=['POST', 'GET'])
+@login_required
 def codigoqr():
     if request.method == 'POST':
         nombremascota = request.form['nombre_mascota']
@@ -104,6 +125,13 @@ def codigoqr():
 
 
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
+            #Agregar la función para guardar la información en la base datos
+
+            id_usuario = ModeloUsuario.obtener_info_usuario(conexion_2, current_user.correo)
+            
+            if id_usuario is not None:
+                ModeloMascota.ingresar_mascota(conexion_2, id_usuario, nombremascota, edad, raza, fecha_nacimiento, peso, vacunado)
+
             """ generar la url con los datos dinamicamente """
             data_url = url_for('mostrar_datos', 
                                 nombremascota=nombremascota,
@@ -208,31 +236,38 @@ def completar_registro(correo):
         flash('Complete todos los campos para poder continuar', 'danger')
         return render_template('completar_registro.html', correo=correo)
 
-@app.route('/restablecer/<token>/', methods=['POSt', 'GET'])
-def restablecer_contrasena(token):
-    if request.method == 'GET':
-        try:
-            email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT, expiration=300)
-            if email: #La confirmación del token fue correcta
-                return render_template('cambiar_contraseña.html') #Falta crear la plantila
-
-            else:
-                flash('El enlace de confirmación es inválido o ha expirado.', 'danger')
-                return redirect(url_for('login'))
-        except:
-            flash('Ocurrio un error inexperado. Intentelo de nuevo', 'danger')
+@app.route('/restablecer/<token>/<correo>/', methods=['POST', 'GET'])
+def restablecer_contraseña(token, correo):
+    try:
+        email = email_token.confirmar_token(token, key=Config.SECRET_KEY, key2=Config.SECURITY_PASSWORD_SALT, expiration=300)
+        if email: #La confirmación del token fue correcta
+            return render_template('cambiar_contraseña.html', correo=correo)
+        else:
+            flash('El enlace de confirmación es inválido o ha expirado.', 'danger')
             return redirect(url_for('login'))
-        
-    #Si la petición es POST
-    else:
-        #Falta desarollar la función para cambiar la contraseña
+    except:
+        flash('Ocurrio un error inexperado. Intentelo de nuevo', 'danger')
+        return redirect(url_for('login'))
+
+@app.route('/cambiar', methods=['POST'])
+def cambiar_contraseña():
+    try:
+        contraseña = request.form['contraseña']
+        correo = request.form['correo']
+
+        ModeloUsuario.cambiar_contraseña(conexion_1, contraseña, correo)
+        flash('Contraseña cambiada satisfactoriamente', 'succes')
+        return redirect(url_for('login'))
+    except:
+        flash('Ocurrio un error inexperado intentelo de nuevo', 'danger')
         return redirect(url_for('login'))
 
 """este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
 persona cuando escanee el codigo"""
 
-@app.route('/mostrardatos',methods = ['POST','GET'])
-def mostrar_datos():
+@app.route('/mostrardatos', methods = ['POST','GET'])
+@login_required
+def mostrar_datos(): #Agregar funcionalidad para guardar la los datos en la base de datos. Con la funció current_user para saber cual es el usuario
     datos = {
         'nombremascota' : request.args.get('nombremascota'),
         'edad' : request.args.get('edad'),
@@ -241,7 +276,7 @@ def mostrar_datos():
         'peso' : request.args.get('peso'),
         'vacunado' : request.args.get('vacunado'),
     }
-    "flash datos obtenidos  correctamente"
+    flash("datos obtenidos  correctamente")
     return render_template('mostrardatos.html', **datos)    
 
     """ se puede manejar de esta forma o de la otra de arriba como diccionario """
@@ -264,6 +299,7 @@ def mostrar_datos():
                             ) """
 
 @app.route('/main', methods=['POST', 'GET'])
+@login_required
 def main_redireccionar():
     return render_template('agregarmascota.html',)
 
@@ -276,7 +312,6 @@ def logout():
 @app.route('/tu_familia', methods=['POST', 'GET'])
 @login_required
 def main():
-
     return render_template('main.html')
 
 if __name__ == '__main__':
