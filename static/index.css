@@ -1,0 +1,94 @@
+body {
+    background-color: #FC923D;
+}
+header {
+    background-color: #FC923D;
+    font-family: "Bangers", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+.img-header {
+    max-width: 25%;
+}
+.video-container {
+    position: relative;
+    overflow: hidden;
+    background-color: black;
+    height: 50vh;
+    border-radius: 5px;
+}
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.capa {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9); 
+    z-index: 2;
+    border-radius: 5px;
+}
+.slogan {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #FC923D;
+    font-weight: 300;
+    font-style: normal;
+}
+.btn_ingresar {
+    font-family: "Merriweather", serif;
+}
+main {
+    background-color: #FC923D;
+}
+.sections {
+    gap: 5rem;
+}
+.section-content {
+    background-color: beige;
+    font-weight: 300;
+    font-style: normal;
+    text-align: center;
+    letter-spacing: 2px;
+    border-radius: 5px;
+    padding: 2rem;
+}
+footer {
+    background-color: #FC923D;
+    padding: 20px;
+    text-align: center;
+    font-family: "Bangers", system-ui;
+    font-weight: 300;
+    font-style: normal;
+}
+.footer-links {
+    margin: 0 10px;
+}
+
+@media (min-width: 320px) and (max-width: 767px) {
+    nav{
+        display: none;
+    }
+    .slogan, .btn_ingresar{
+        font-size: 8px;
+    }
+    .colum1{
+        display: flex;
+        justify-content: space-around;
+    }
+}
+@media (min-width: 768px) and (max-width: 1440px) {
+    .nav{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+

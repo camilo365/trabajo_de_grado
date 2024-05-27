@@ -3,12 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='./index.css')}}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <title>Id Pets</title>
 </head>
 <body>
-    <h1> ID PETS </h1>
-    <a href="{{url_for('login')}}"> IR A INICIAR SESIÓN </a> <br> <hr>
-    <a href="{{url_for('registrar')}}"> IR A REGISTRARCE</a> <br> <hr>
+    <header class="container-fluid p-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center colum1">
+                <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-header ml-3" alt="Id Pets Logo">
+                <p class="ml-5 mt-3 text-center frase">Amor y cuidado para tus mascotas</p>
+            </div>
+            <nav>
+                <ul class="nav">
+                    <li class="nav-item"><a class="nav-link text-dark mt-2" href="#quienes_somos">Quienes somos</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark mt-2" href="#como_funciona">Como funciona</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark mt-2" href="#Caracteristicas">Caracteristicas</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark mt-2" href="{{url_for('registrar')}}">Registrarse</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{url_for('login')}}"><button class="btn btn-dark">INICIAR SESIÓN</button></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container-fluid">
+        <div class="video-container my-4 mx-auto">
+            <video autoplay loop muted>
+                <source src="{{ url_for('static', filename='imagenes/fondo.mp4')}}" type="video/mp4">
+                Tu navegador no soporta la etiqueta de video.
+            </video>
+            <div class="capa"></div>
+            <div class="slogan text-center p-4">
+                <p >¡Nunca más pierdas a tu mascota! Con nuestros perfiles digitales y códigos QR únicos, 
+                cualquier persona puede ayudarte a reunir a tu amigo peludo contigo rápidamente. 
+                <strong>¡Seguridad y tranquilidad en tus manos!</strong></p>
+                <a href="{{url_for('login')}}"><button class="btn btn-dark mt-3 btn_ingresar">Ingresar a Id pets</button></a>
+            </div>
+        </div>
+
+        <div class="sections container">
+            <section id="quienes_somos" class="section-content my-4">
+                <h4>Quienes Somos</h4>
+                <p>Comprendemos el profundo vínculo que hay entre las mascotas y sus familias, así como la angustia de perder a un compañero peludo. Nuestra misión va más allá de ofrecer una herramienta tecnológica; buscamos brindar esperanza y tranquilidad en momentos difíciles, asegurando que cada mascota tenga la oportunidad de regresar a casa.</p>
+            </section>
+
+            <section id="como_funciona" class="section-content my-4">
+                <h4>Como Funciona</h4>
+                <p>Nuestra plataforma permite a los dueños de las mascotas crear perfiles digitales con códigos QR únicos para cada una de ellas. En el momento en que tu amigo peludo se pierda, cualquier persona usando un dispositivo móvil podrá escanear dicho código, obteniendo tu información de contacto; pudiendo así ponerse en contacto contigo y facilitando su proceso de reunión. Esto asegura que, en caso de pérdida, puedas ser contactado rápidamente y tu mascota pueda regresar a casa lo antes posible.</p>
+            </section>
+
+            <section id="Caracteristicas" class="section-content my-4">
+                <h4>Caracteristicas</h4>
+                <p>Nuestra plataforma ofrece una variedad de características diseñadas para garantizar la seguridad y bienestar de las mascotas. Además de la creación de perfiles digitales con códigos QR únicos, proporcionamos herramientas para agregar información detallada sobre la mascota, como su historial médico, alergias o necesidades especiales. Además, nuestra plataforma promueve la comunidad entre amantes de los animales, ofreciendo recursos, consejos y apoyo para mantener a las mascotas seguras y saludables.</p>
+            </section>
+        </div>
+    </main>
+
+    <footer class="container-fluid">
+        <p>&copy; 2024 ID Pets. Todos los derechos reservados.</p>
+        <nav>
+            <a href="#" class="footer-links">Términos de Servicio</a> |
+            <a href="#" class="footer-links">Política de Privacidad</a> |
+            <a href="#" class="footer-links">Contacto</a>
+        </nav>
+        <p>Síguenos en: 
+            <a href="https://facebook.com" target="_blank" class="footer-links">Facebook</a>, 
+            <a href="https://twitter.com" target="_blank" class="footer-links">Twitter</a>, 
+            <a href="https://instagram.com" target="_blank" class="footer-links">Instagram</a>
+        </p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-

@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, redirect, flash, url_for, send_file
-#from flask_babel import Domain
 from config import Config
 import qrcode
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -123,13 +122,12 @@ def codigoqr():
         peso = request.form['peso']
         vacunado = request.form['vacunado']
 
-
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
             #Agregar la función para guardar la información en la base datos
 
             id_usuario = ModeloUsuario.obtener_info_usuario(conexion_2, current_user.correo)
             
-            if id_usuario is not None:
+            if id_usuario is not None: #Guardar la mascota en la base de datos
                 ModeloMascota.ingresar_mascota(conexion_2, id_usuario, nombremascota, edad, raza, fecha_nacimiento, peso, vacunado)
 
             """ generar la url con los datos dinamicamente """
