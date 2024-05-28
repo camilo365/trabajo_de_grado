@@ -265,7 +265,7 @@ persona cuando escanee el codigo"""
 
 @app.route('/mostrardatos', methods = ['POST','GET'])
 @login_required
-def mostrar_datos(): #Agregar funcionalidad para guardar la los datos en la base de datos. Con la funció current_user para saber cual es el usuario
+def mostrar_datos():
     datos = {
         'nombremascota' : request.args.get('nombremascota'),
         'edad' : request.args.get('edad'),
@@ -305,12 +305,13 @@ def main_redireccionar():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/tu_familia', methods=['POST', 'GET'])
 @login_required
 def main():
-    return render_template('main.html')
+    datos = ModeloMascota.cargar_datos_mascota(db=conexion_2, correo_usuario=current_user.correo)
+    return render_template('main.html', datos=datos)
 
 if __name__ == '__main__':
     csrf.init_app(app)

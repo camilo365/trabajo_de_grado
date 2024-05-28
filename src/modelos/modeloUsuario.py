@@ -89,7 +89,7 @@ class ModeloUsuario():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT identificacion FROM usuario_info WHERE correo = %s", (correo_usuario,))
+            cursor.execute("SELECT identificacion FROM usuario_info WHERE correo=%s", (correo_usuario,))
 
             datos = cursor.fetchone()
 
