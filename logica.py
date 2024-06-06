@@ -319,6 +319,7 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/eliminar', methods=['POST'])
+@login_required
 def eliminar():
     if 'id' in request.form:
         id = int(request.form['id'])
@@ -329,6 +330,7 @@ def eliminar():
     return redirect(url_for('main')) # Otra acción a realizar después de eliminar la mascota
 
 @app.route('/editar', methods=['POST'])
+@login_required
 def editar():
     if 'id' in request.form:
         print("bienvenido")

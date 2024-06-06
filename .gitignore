@@ -3,6 +3,7 @@ env/
 __pycache__/
 src/modelos/__pycache__/
 src/modelos/entidades/__pycache__/
+static/qrcodes/
 
 dict.py
 static/imagenes/
