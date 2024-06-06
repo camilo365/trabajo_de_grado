@@ -4,8 +4,10 @@ import os
 
 class User(UserMixin):
 
-    def __init__(self, id=None, usuario=None, correo=None, validado=0, contraseña_hash=None,  salt=None, p_completado=0) -> None:
+    def __init__(self, id=None, identificacion=0, celular=3113702038, usuario=None, correo=None, validado=0, contraseña_hash=None,  salt=None, p_completado=0) -> None:
         self.id = id
+        self.identificacion = identificacion
+        self.celular = celular
         self.usuario = usuario
         self.correo = correo
         self.validado = validado

@@ -7,14 +7,13 @@ class ModeloUsuario():
         try:
             conexion = db()
             cursor = conexion.cursor()
-
-            cursor.execute("SELECT id, usuario, correo, validado, contraseña_hash, salt, p_completado FROM credenciales WHERE usuario=%s", (user.usuario,))
+            cursor.execute("SELECT id, identificacion, celular, usuario, correo, validado, contraseña_hash, salt, p_completado FROM credenciales WHERE usuario=%s", (user.usuario,))
             datos = cursor.fetchone()
             conexion.close()
             cursor.close()
 
             if datos is not None:
-                return User(id=datos[0], usuario=datos[1], correo=datos[2], validado=datos[3], contraseña_hash=User.validar_contrasena(datos[4], user.contraseña_hash + datos[5]), p_completado=datos[6])
+                return User(id=datos[0], identificacion=datos[1], celular=datos[2], usuario=datos[3], correo=datos[4], validado=datos[5], contraseña_hash=User.validar_contrasena(datos[6], user.contraseña_hash + datos[7]), p_completado=datos[8])
             else:
                 return None
             
@@ -51,9 +50,14 @@ class ModeloUsuario():
             conexion = db()
 
             cursor = conexion.cursor()
-
-            cursor.execute("INSERT INTO credenciales(usuario, correo, validado, contraseña_hash, salt, p_completado) VALUES (%s, %s, %s, %s, %s, %s)", (user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt, user.p_completado))
-
+            print(user.identificacion)
+            print(user.usuario)
+            print(user.correo)
+            print(user.validado)
+            print(user.contraseña_hash)
+            print(user.salt)
+            print(user.p_completado)
+            cursor.execute("INSERT INTO credenciales(identificacion, celular, usuario, correo, validado, contraseña_hash, salt, p_completado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (user.identificacion, user.celular, user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt, user.p_completado))
             cursor.close()
 
             conexion.commit()
@@ -69,14 +73,14 @@ class ModeloUsuario():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT id, usuario, correo FROM credenciales WHERE id=%s", (id,))
+            cursor.execute("SELECT id, identificacion, usuario, correo FROM credenciales WHERE id=%s", (id,))
             datos = cursor.fetchone()
             
             conexion.close()
             cursor.close()
 
             if datos is not None:
-                return User(id=datos[0], usuario=datos[1], correo=datos[2])
+                return User(id=datos[0], identificacion=datos[1], usuario=datos[2], correo=datos[3])
             else:
                 return None
             

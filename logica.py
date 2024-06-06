@@ -5,11 +5,13 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from flask_security import Security
+
 import email_token
 from DB import conexion_1, conexion_2
 import os
 import controlador_db
 from io import BytesIO
+
 
 # Identidades
 from src.modelos.entidades.usuario import User
@@ -26,6 +28,7 @@ mail = Mail(app)
 
 login_manager_app = LoginManager(app)
 login_manager_app.login_view = 'login'
+
 
 @login_manager_app.user_loader
 def load_user(id):
@@ -115,7 +118,7 @@ redirecciona a las personas a la plantilla mostrardatos que es donde van a estar
 @login_required
 def codigoqr():
     if request.method == 'POST':
-        nombremascota = request.form['nombre_mascota']
+        nombremascota = request.form['nombremascota']
         edad = request.form['edad']
         raza = request.form['raza']
         fecha_nacimiento = request.form['fecha_nacimiento']
@@ -126,6 +129,7 @@ def codigoqr():
             #Agregar la función para guardar la información en la base datos
 
             id_usuario = ModeloUsuario.obtener_info_usuario(conexion_2, current_user.correo)
+            
             
             if id_usuario is not None: #Guardar la mascota en la base de datos
                 ModeloMascota.ingresar_mascota(conexion_2, id_usuario, nombremascota, edad, raza, fecha_nacimiento, peso, vacunado)
@@ -155,7 +159,7 @@ def codigoqr():
 
             # Generar la URL para la imagen
             img_url = url_for('static', filename=f'qrcodes/{nombremascota}.png')
-
+            mascotas = ModeloMascota.mascotas_datos(conexion_2, id_usuario)
             return render_template('main.html', 
                                    img_url=img_url, 
                                    nombremascota=nombremascota, 
@@ -163,7 +167,9 @@ def codigoqr():
                                    raza=raza, 
                                    fecha_nacimiento=fecha_nacimiento, 
                                    peso=peso, 
-                                   vacunado=vacunado)
+                                   vacunado=vacunado,
+                                   mascotas=mascotas
+                                   )
 
             """ Guarda la imagen en un buffer de memoria""" 
             """ img_io = BytesIO()
@@ -199,10 +205,12 @@ def registrar():
             return render_template('registrar.html')
 
         else:
+            identificacion = request.form['identificacion']
+            celular = request.form['celular']
             usuario = request.form['usuario_registrar']
             correo = request.form['email']
             salt = User.salt()
-            credenciales = User(usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
+            credenciales = User(identificacion=identificacion, celular=celular, usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
 
             if email_token.enviar_correo_confirmacion(mail, Config.SECRET_KEY, Config.SECURITY_PASSWORD_SALT, usuario=usuario, correo=correo):
                 flash('Usuario registrado exitosamente. Se envio un enlace de confirmación a su correo')
@@ -263,23 +271,13 @@ def cambiar_contraseña():
 """este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
 persona cuando escanee el codigo"""
 
-@app.route('/mostrardatos', methods = ['POST','GET'])
+
+@app.route('/mostrardatos', methods=['GET','POST'])
 @login_required
 def mostrar_datos():
-    datos = {
-        'nombremascota' : request.args.get('nombremascota'),
-        'edad' : request.args.get('edad'),
-        'raza' : request.args.get('raza'),
-        'fecha_nacimiento' : request.args.get('fecha_nacimiento'),
-        'peso' : request.args.get('peso'),
-        'vacunado' : request.args.get('vacunado'),
-    }
-    flash("datos obtenidos  correctamente")
-    return render_template('mostrardatos.html', **datos)    
-
     """ se puede manejar de esta forma o de la otra de arriba como diccionario """
     
-    """ nombremascota = request.args.get('nombremascota')
+    nombremascota = request.args.get('nombremascota')
     edad = request.args.get('edad')
     raza = request.args.get('raza')
     fecha_nacimiento = request.args.get('fecha_nacimiento')
@@ -294,24 +292,48 @@ def mostrar_datos():
                             fecha_nacimiento=fecha_nacimiento, 
                             peso=peso, 
                             vacunado=vacunado
-                            ) """
+                            )
 
-@app.route('/main', methods=['POST', 'GET'])
+@app.route('/tu_familia', methods=['GET'])
 @login_required
-def main_redireccionar():
-    return render_template('agregarmascota.html',)
+def main():
+    try:
+        # Obtener el ID del usuario actual
+        id_usuario = current_user.identificacion
+        print(id_usuario)
+        # Obtener todas las mascotas asociadas al usuario actual
+        mascotas = ModeloMascota.mascotas_datos(conexion_2,id_usuario)
+        
+        # Pasar los datos de las mascotas a la plantilla
+        return render_template('main.html', mascotas=mascotas)
+    
+    except Exception as e:
+        flash(str(e))
+        return render_template('main.html', mascotas=[])
+
 
 @app.route('/cerrar_sesion')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
-@app.route('/tu_familia', methods=['POST', 'GET'])
-@login_required
-def main():
-    datos = ModeloMascota.cargar_datos_mascota(db=conexion_2, correo_usuario=current_user.correo)
-    return render_template('main.html', datos=datos)
+@app.route('/eliminar', methods=['POST'])
+def eliminar():
+    if 'id' in request.form:
+        id = int(request.form['id'])
+        id_usuario = current_user.identificacion
+        print(id)
+        eliminar = ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
+        print(eliminar)
+    return redirect(url_for('main')) # Otra acción a realizar después de eliminar la mascota
+
+@app.route('/editar', methods=['POST'])
+def editar():
+    if 'id' in request.form:
+        print("bienvenido")
+    return redirect(url_for('main'))
+
 
 if __name__ == '__main__':
     csrf.init_app(app)

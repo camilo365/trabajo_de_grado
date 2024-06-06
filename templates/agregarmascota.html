@@ -30,19 +30,22 @@
         <form action="{{url_for('codigoqr')}}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div >
-                <input type="file" name="image" class="rounded mx-auto d-block border col-5 mb-2">
+                <input type="file" name ="image" id="fileInput"  class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
+            </div>
+            <div id="imagePreview" class="d-flex justify-content-center" style="width="5%"">
+                
             </div>
             <div class="mb-3">
-                <input type="text" name="nombre_mascota" placeholder="nombre_mascota" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="text" name="nombremascota" placeholder="Nombre_mascota" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
             </div>
             <div class="mb-3">
-                <input type="text" name="edad" placeholder="edad" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="text" name="edad" placeholder="Edad" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
             </div>
             <div class="mb-3">
-                <input type="text" name="raza" placeholder="raza" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="text" name="raza" placeholder="Raza" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
             </div>
             <div class="mb-3">
-                <input type="date" name="fecha_nacimiento" placeholder="fecha_nacimiento" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="date" name="fecha_nacimiento" placeholder="Fecha_nacimiento" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
             </div>
             <div class="mb-3">
                 <input type="text" name="peso" placeholder="peso" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
@@ -56,7 +59,7 @@
         </form>
     </div>
 
+    <script src="{{ url_for('static', filename='js/efectos.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="./efectos.js"></script>
 </body>
 </html>

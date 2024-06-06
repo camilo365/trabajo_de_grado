@@ -1,6 +1,8 @@
 from src.modelos.modeloUsuario import ModeloUsuario
 from DB import conexion_1, conexion_2
 
+import json
+
 class ModeloMascota():
 
     @classmethod
@@ -44,14 +46,33 @@ class ModeloMascota():
 
         except Exception as ex:
             raise Exception(ex)
+    
+    
+    # modeloMascota.py
 
     @classmethod
-    def eliminar_mascota(self, db, id_usuario):
+    def mascotas_datos(cls, db, id_usuario):
+        try:
+            conexion = db()
+            cursor = conexion.cursor()
+            print(id_usuario)
+            cursor.execute("SELECT * FROM mascotas_info m LEFT JOIN usuario_info u ON m.id_dueño = u.identificacion WHERE u.identificacion = %s", (id_usuario))
+            mascotas = cursor.fetchall()  # Obtener todas las filas de resultados
+            print(mascotas)
+            cursor.close()
+            conexion.close()
+            return mascotas  # Devolver los datos de las mascotas
+        except Exception as ex:
+            raise Exception("Error al obtener datos de mascotas: {}".format(ex))
+
+
+    @classmethod
+    def eliminar_mascota(cls, db, id, id_usuario):
         try:
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("DELETE FROM mascotas_info WHERE id_dueño=%s",(id_usuario,))
+            cursor.execute("DELETE FROM mascotas_info WHERE id_mascota=%s AND id_dueño=%s", (id, id_usuario))
 
             conexion.commit()
             cursor.close()

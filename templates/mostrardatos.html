@@ -30,7 +30,7 @@
                 <tbody>
                     <tr>
                         <td>Nombre</td>
-                        <td>{{nombremascota}}</td>
+                        <td> {{nombremascota}}</td>
                     </tr>
                     <tr>
                         <td>Edad</td>
@@ -53,8 +53,12 @@
                         <td>{{vacunado}}</td>
                     </tr>
                     <tr>
-                        <td>usuario_dueño</td>
-                        <td>{{usuario}}</td>
+                        <td>Correo_dueño</td>
+                        <td>{{current_user.correo}}</td>
+                    </tr>
+                    <tr>
+                        <td>celular_dueño</td>
+                        <td>{{current_user.celular}}</td>
                     </tr>
                 </tbody>
             </table>
