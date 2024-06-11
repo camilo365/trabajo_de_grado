@@ -10,6 +10,7 @@ import email_token
 from DB import conexion_1, conexion_2
 import os
 import controlador_db
+from datetime import datetime
 from io import BytesIO
 
 
@@ -123,13 +124,12 @@ def codigoqr():
         raza = request.form['raza']
         fecha_nacimiento = request.form['fecha_nacimiento']
         peso = request.form['peso']
-        vacunado = request.form['vacunado']
+        vacunado = 1 if request.form.get('vacunado') == 'Si' else 0
 
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
             #Agregar la función para guardar la información en la base datos
 
             id_usuario = ModeloUsuario.obtener_info_usuario(conexion_2, current_user.correo)
-            
             
             if id_usuario is not None: #Guardar la mascota en la base de datos
                 ModeloMascota.ingresar_mascota(conexion_2, id_usuario, nombremascota, edad, raza, fecha_nacimiento, peso, vacunado)
@@ -161,22 +161,15 @@ def codigoqr():
             img_url = url_for('static', filename=f'qrcodes/{nombremascota}.png')
             mascotas = ModeloMascota.mascotas_datos(conexion_2, id_usuario)
             return render_template('main.html', 
-                                   img_url=img_url, 
-                                   nombremascota=nombremascota, 
-                                   edad=edad, 
-                                   raza=raza, 
-                                   fecha_nacimiento=fecha_nacimiento, 
-                                   peso=peso, 
-                                   vacunado=vacunado,
-                                   mascotas=mascotas
-                                   )
-
-            """ Guarda la imagen en un buffer de memoria""" 
-            """ img_io = BytesIO()
-            img.save(img_io, 'PNG')
-            img_io.seek(0)
-
-            return send_file(img_io, mimetype='image/png') """
+                                    img_url=img_url, 
+                                    nombremascota=nombremascota, 
+                                    edad=edad, 
+                                    raza=raza, 
+                                    fecha_nacimiento=fecha_nacimiento, 
+                                    peso=peso, 
+                                    vacunado=vacunado,
+                                    mascotas=mascotas
+                                    )
             
         else:
             flash("Todos los campos son obligatorios")
@@ -300,17 +293,16 @@ def main():
     try:
         # Obtener el ID del usuario actual
         id_usuario = current_user.identificacion
-        print(id_usuario)
+
         # Obtener todas las mascotas asociadas al usuario actual
         mascotas = ModeloMascota.mascotas_datos(conexion_2,id_usuario)
-        
+
         # Pasar los datos de las mascotas a la plantilla
         return render_template('main.html', mascotas=mascotas)
     
     except Exception as e:
         flash(str(e))
         return render_template('main.html', mascotas=[])
-
 
 @app.route('/cerrar_sesion')
 @login_required
@@ -324,18 +316,44 @@ def eliminar():
     if 'id' in request.form:
         id = int(request.form['id'])
         id_usuario = current_user.identificacion
-        print(id)
-        eliminar = ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
-        print(eliminar)
+
+        ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
     return redirect(url_for('main')) # Otra acción a realizar después de eliminar la mascota
 
-@app.route('/editar', methods=['POST'])
+@app.route('/editar_familiar', methods=['POST'])
 @login_required
 def editar():
-    if 'id' in request.form:
-        print("bienvenido")
-    return redirect(url_for('main'))
+    id_mascota = int(request.form['id'])
+    mascota = ModeloMascota.cargar_datos_mascota(conexion_2, current_user.identificacion, id_mascota)
 
+    return render_template('editar_familiar.html', mascota=mascota, id_mascota=id_mascota)
+
+@app.route('/confirmar_editar_mascota', methods=['POST'])
+@login_required
+def confirmar_editar_mascota():
+    try:
+        id_mascota = int(request.form['id'])
+        nombre_mascota = request.form['nombremascota']
+        edad = int(request.form['edad'])
+        raza = request.form['raza']
+        fecha_nacimiento = datetime.strptime(request.form['fecha_nacimiento'], "%Y-%m-%d").date()
+        #datetime.strptime(request.form['fecha_nacimiento'], "%Y-%m-%d").date() Nesecario para Convertir la fecha a un objeto datetime.date
+        peso = int(request.form['peso'])
+        vacunado = 1 if request.form.get('vacunado') == 'Si' else 0
+
+        nuevos_datos = (nombre_mascota, edad, raza, fecha_nacimiento, peso, vacunado)
+
+        #Cargar los datos de la mascota(en base al id) desde la base de datos
+        datos_almacenados = ModeloMascota.cargar_datos_mascota(conexion_2, current_user.identificacion, id_mascota)
+
+        #Actualizar los datos de la mascota en la base de datos
+        ModeloMascota.actualizar_mascota(conexion_2, datos_almacenados, nuevos_datos, id_mascota)
+
+        return redirect(url_for('main'))
+    
+    except:
+        flash('Lo sentimos, ha ocurrido un error inesperado. Por favor, inténtelo de nuevo')
+        return redirect(url_for('main'))
 
 if __name__ == '__main__':
     csrf.init_app(app)

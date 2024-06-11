@@ -45,13 +45,13 @@
         <form method="post" action="{{ url_for('login') }}" class="d-flex flex-column">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Token para impedir ataques CSRF -->
             <div class="mb-3"><!-- ------------------------------------------------------------------------ -->
-                <input type="text" name="usuario" placeholder="usuario" autocomplete="off" class="rounded mx-auto d-block border col-7">
+                <input type="text" name="usuario" placeholder="usuario" autocomplete="off" class="rounded mx-auto d-block border col-5 p-2">
             </div>
             <div class="mb-3">
-                <input type="password" name="contraseña" placeholder="contraseña" autocomplete="off" class="rounded mx-auto d-block border col-7">
+                <input type="password" name="contraseña" placeholder="contraseña" autocomplete="off" class="rounded mx-auto d-block border col-5 p-2">
             </div>
             <div class="mb-3">
-                <input type="submit" name="ingresar" class="rounded mx-auto d-block p-1 border-0" value="INGRESAR">
+                <input type="submit" name="ingresar" class="rounded mx-auto d-block p-1 border-0 col-2" value="INGRESAR">
             </div>
         </form>
             <div class="mb-3 text-center">
@@ -65,7 +65,7 @@
         </div>
 
         <div class="mb-3 text-center">
-            <a href="{{ url_for('index') }}" class="btn bg-secondary-subtle p-1 border-0">REGRESAR</a>
+            <a href="{{ url_for('index') }}" class="btn bg-secondary-subtle p-1 border-0 col-1">REGRESAR</a>
         </div>
 
     </div>

@@ -50,13 +50,6 @@ class ModeloUsuario():
             conexion = db()
 
             cursor = conexion.cursor()
-            print(user.identificacion)
-            print(user.usuario)
-            print(user.correo)
-            print(user.validado)
-            print(user.contraseña_hash)
-            print(user.salt)
-            print(user.p_completado)
             cursor.execute("INSERT INTO credenciales(identificacion, celular, usuario, correo, validado, contraseña_hash, salt, p_completado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (user.identificacion, user.celular, user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt, user.p_completado))
             cursor.close()
 

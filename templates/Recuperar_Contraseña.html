@@ -48,15 +48,15 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Token para impedir ataques CSRF -->
             
             <div class="d-flex justify-content-center mt-3">
-                <input class="rounded col-5 p-1" type="email" name="correo" placeholder="Correo" required>
+                <input class="rounded border-0 col-5 p-2" type="email" name="correo" placeholder="Correo" required>
             </div>
-            <div class="d-flex justify-content-center mt-2">
-                <input class="rounded col-3 p-1" type="submit" value="ENVIAR">
+            <div class="d-flex justify-content-center mt-3">
+                <input class="rounded border-0 col-3 p-1" type="submit" value="ENVIAR">
             </div>
         </form>
 
-        <div class="d-flex justify-content-center mt-2">
-            <button> <a href="{{url_for('login')}}"> CANCELAR </a> </button>
+        <div class="d-flex justify-content-center mt-4">
+            <button class="rounded border-0"> <a href="{{url_for('login')}}" class="text-decoration-none text-dark"> CANCELAR </a> </button>
         </div>
 
     </div>
