@@ -56,7 +56,8 @@ class ModeloMascota():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT * FROM mascotas_info m LEFT JOIN usuario_info u ON m.id_dueño = u.identificacion WHERE u.identificacion = %s", (id_usuario))
+            #cursor.execute("SELECT * FROM mascotas_info m LEFT JOIN usuario_info u ON m.id_dueño = u.identificacion WHERE u.identificacion = %s", (id_usuario,))
+            cursor.execute("SELECT * FROM mascotas_info WHERE id_dueño = %s", (id_usuario,))
             mascotas = cursor.fetchall()  # Obtener todas las filas de resultados
 
             cursor.close()

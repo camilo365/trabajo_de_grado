@@ -30,7 +30,7 @@
         <form action="{{url_for('codigoqr')}}" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div >
-                <input type="file" name ="image" id="fileInput"  class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
+                <input type="file" name="image" id="fileInput"  class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
             </div>
             <div id="imagePreview" class="d-flex justify-content-center" style="width:5%">
                 
@@ -53,8 +53,8 @@
             <div class="mb-3 col-5 mx-auto d-flex" style="gap: 20px;">
                 <label><strong>¿Vacunado?</strong></label>
                 <select id="vacunado" name="vacunado" class="rounded border" required>
-                    <option value="Si">Si</option>
-                    <option value="No">No</option>
+                    <option>Si</option>
+                    <option>No</option>
                 </select>
             </div>
             <div class="mb-3">
