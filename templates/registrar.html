@@ -40,31 +40,46 @@
 
         <form method="post" action="{{ url_for('registrar') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="mb-2">
-                <input type="text" name="identificacion" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="identificacion" required autofocus>
+            <div class="mb-3">
+                <input type="text" name="identificacion" class="rounded mx-auto d-block p-2 border-0 col-5" autocomplete="off" placeholder="Identificacion" pattern="\d{6,}" title="Ingrese un numero de cedula válido" required autofocus>
             </div>
-            <div class="mb-2">
-                <input type="text" name="celular" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="celular" required autofocus>
+
+            
+            <div class="mb-3">
+                <input type="text" name="nombre" placeholder="Nombres" autocomplete="off" class="rounded mx-auto d-block p-2 border-0 col-5" required>
             </div>
-            <div class="mb-2">
-                <input type="text" name="usuario_registrar" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="Nombre de usuario" required autofocus>
+
+            <div class="mb-3">
+                <input type="text" name="apellido" placeholder="Apellido" autocomplete="off" class="rounded mx-auto d-block p-2 border-0 col-5" required>
             </div>
-            <div class = "mb-2">
-                <input type="email" name="email" class="rounded mx-auto d-block p-2 border-0" autocomplete="off" placeholder="Email" required>
+
+            <div class="mb-3">
+                <input type="text" name="edad" placeholder="Edad" autocomplete="off" class="rounded mx-auto d-block p-2 border-0 col-5" pattern="\d{1,}" title="Ingrese un numero de cedula válido" required>
             </div>
-            <div class = "mb-2">
-                <input type="password" name="password_registrar" class="rounded mx-auto d-block p-2  border-0" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Contraseña" required>
+
+
+            <div class="mb-3">
+                <input type="text" name="celular" class="rounded mx-auto d-block p-2 border-0 col-5" autocomplete="off" placeholder="Celular" pattern="\d{10,}" title="Ingrese un numero de celular válido(sin indicativo de pais)" required>
             </div>
-            <div class = "mb-2">
-                <input type="password" name="confirmar_password" class="rounded mx-auto d-block p-2  border-0" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Confirmar contraseña" required>
+            <div class="mb-3">
+                <input type="text" name="usuario_registrar" class="rounded mx-auto d-block p-2 border-0 col-5" autocomplete="off" placeholder="Nombre de usuario" required>
+            </div>
+            <div class="mb-3">
+                <input type="email" name="email" class="rounded mx-auto d-block p-2 border-0 col-5" autocomplete="off" placeholder="Email" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password_registrar" class="rounded mx-auto d-block p-2 border-0 col-5" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Contraseña" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="confirmar_password" class="rounded mx-auto d-block p-2 border-0 col-5" pattern="^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}$" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" autocomplete="off" placeholder="Confirmar contraseña" required>
             </div>
 
             <!-- botones  -->
-            <div class = "mb-3">
-                <input type="submit" name="btn_registrar" class="rounded mx-auto d-block p-1 border-0" value="REGISTRARCE">
+            <div class="mb-3">
+                <input type="submit" name="btn_registrar" class="rounded mx-auto d-block p-1 border-0 col-2" value="REGISTRARSE">
             </div>
             <div class = "mb-2">
-                <a href="{{url_for('index')}}" class="text-decoration-none"><input type="button" name="btn_cancelar" class="rounded mx-auto d-block p-1  border-0" value="CANCELAR"></a>
+                <a href="{{url_for('index')}}" class="text-decoration-none"><input type="button" name="btn_cancelar" class="rounded mx-auto d-block p-1 border-0 col-1" value="CANCELAR"></a>
             </div>
         </form>
     </div>

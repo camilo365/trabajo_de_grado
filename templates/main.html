@@ -11,7 +11,7 @@
     <div class="fondo-color">
         <form action="{{ url_for('codigoqr') }}" method="get">
             <!--<form action="{{ url_for('main') }}" method="get">-->
-            <h1 class="d-flex justify-content-center">Bienvenido {{ current_user.identificacion }}</h1>
+            <h1 class="d-flex justify-content-center">¡Hola, {{ current_user.nombre }}!</h1>
             <div class="modal-foto mx-auto rounded">
                 <p>{{ datos }}</p>
             </div>
@@ -49,7 +49,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <img src="{{ url_for('static', filename='imagenes/perrito.jpg') }}" class="img-fluid" alt="Mascota">
+                                        <img src="{{ mascota[9] }}" class="img-fluid" alt="Mascota">
                                     </div>
                                     <div class="col-md-8">
                                         <div class="table-responsive">
@@ -57,14 +57,14 @@
                                                 <tbody>
                                                     <tr>
                                                         <th scope="row">Cédula Propietario</th>
-                                                        <td>{{ mascota[1] }}</td>
+                                                        <td>{{ current_user.identificacion }}</td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Nombre Mascota</th>
                                                         <td>{{ mascota[2] }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th scope="row">Edad</th>
+                                                        <th scope="row">Edad(años)</th>
                                                         <td>{{ mascota[3] }}</td>
                                                     </tr>
                                                     <tr>
@@ -76,20 +76,24 @@
                                                         <td>{{ mascota[5] }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th scope="row">Peso</th>
+                                                        <th scope="row">Peso(kg)</th>
                                                         <td>{{ mascota[6] }}</td>
                                                     </tr>
                                                     <tr>
+                                                        <th scope="row">Vacunado</th>
+                                                        <td>{% if mascota[7] == 1 %} Si {% else %} No {% endif %}</td>
+                                                    </tr>
+                                                    <tr>
                                                         <th scope="row">Nombre Dueño</th>
-                                                        <td>{{ mascota[9] }}</td>
+                                                        <td>{{ current_user.nombre }}</td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Apellido Dueño</th>
-                                                        <td>{{ mascota[11] }}</td>
+                                                        <td>{{ current_user.apellido }}</td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Correo</th>
-                                                        <td>{{ mascota[10] }}</td>
+                                                        <td>{{ current_user.correo }}</td>
                                                     </tr>
                                                     
                                                     <tr>

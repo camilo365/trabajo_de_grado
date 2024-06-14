@@ -15,6 +15,7 @@ def confirmar_token(token, key, key2, expiration): #El correo expiración en 24 
         email = serializer.loads(token, salt=key2, max_age=expiration) 
     except:
         return False
+    
     return email
 
 #Enviar correo para confirmar la cuenta

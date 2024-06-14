@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar información familiar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='./estilo.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="fondo-color">
+        <div>
+            <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="Logo Id Pets">
+        </div>
+        <!-- ALERT para mostrar si hay un error -->
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        
+            {% for message in messages %}
+            <div class="container text-center">
+                <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
+                    <strong class="text-dark"> {{ message }} </strong>
+                    <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+            {% endfor %}
+        
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{url_for('confirmar_editar_mascota')}}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="id" value="{{ id_mascota }}">
+            <div >
+                <input type="file" name="image" id="fileInput"  class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
+            </div>
+            <div id="imagePreview" class="d-flex justify-content-center" style="width:5%">
+
+            </div>
+            <div class="mb-3">
+                <label for="input1" class="mx-auto d-block col-5 mb-1">Nombre : </label>
+                <input type="text" name="nombremascota" autocomplete="off" class="rounded mx-auto d-block col-5 border p-1" id="input1" value="{{ mascota[0] }}" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="input2" class="mx-auto d-block col-5 mb-1">Edad : </label>
+                <input type="text" name="edad" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" id="input2" pattern="\d{1,}" title="Ingrese un valor numerico" value="{{ mascota[1] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="input3" class="mx-auto d-block col-5 mb-1">Raza : </label>
+                <input type="text" name="raza" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" id="input3" value="{{ mascota[2] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="input4" class="mx-auto d-block col-5 mb-1">Fecha de nacimiento : </label>
+                <input type="date" name="fecha_nacimiento" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" id="input4" value="{{ mascota[3] }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="input5" class="mx-auto d-block col-5 mb-1">Peso : </label>
+                <input type="text" name="peso" autocomplete="off" class="rounded mx-auto d-block border col-5" id="input5" pattern="\d{1,}" title="Ingrese un valor numerico" value="{{ mascota[4] }}" required>
+            </div>
+
+            <div class="mb-3 col-5 mx-auto d-flex" style="gap: 20px;">
+                <label><strong>¿Vacunado?</strong></label>
+                <select id="vacunado" name="vacunado" class="rounded border" required>
+                    <option>{% if mascota[5] == 1 %} Si {% else %} No {% endif %}</option>
+                    <option>{% if mascota[5] == 0 %} Si {% else %} No {% endif %}</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="rounded mx-auto d-block border col-2 p-1">Guardar</button>
+            </div>
+
+            <div class="mt-4">
+                <button type="button" class="rounded mx-auto d-block border col-1 p-1"><a href="{{url_for('main')}}" class="text-decoration-none text-dark">Regresar</a></button>
+            </div>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/efectos.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

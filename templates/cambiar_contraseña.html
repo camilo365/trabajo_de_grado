@@ -38,11 +38,10 @@
         <form method="post" action="{{url_for('cambiar_contraseña')}}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> <!-- Token para impedir ataques CSRF -->
 
-            <input type="hidden" name="correo" value="{{ correo }}">
-
             <div class="d-flex justify-content-center mt-3">
-                <input class="rounded col-5 p-1" type="text" minlength="8" name="contraseña" placeholder="Ingrese nueva contraseña:" required>
+                <input class="rounded col-5 p-1" type="text"  name="contraseña" placeholder="Ingrese nueva contraseña:" pattern="(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).{6,}" title="La contraseña debe tener: 1 numero, 1 Mayuscula y 1 caracter especial" required>
             </div>
+
             <div class="d-flex justify-content-center mt-2">
                 <input class="rounded col-3 p-1" type="submit" value="ENVIAR">
             </div>

@@ -15,7 +15,6 @@
         <!-- ALERT para mostrar si hay un error -->
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        
             {% for message in messages %}
             <div class="container text-center">
                 <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
@@ -24,37 +23,43 @@
                 </div>
             </div>
             {% endfor %}
-        
-            {% endif %}
+        {% endif %}
         {% endwith %}
-        <form action="{{url_for('codigoqr')}}" method="post">
+        <form action="{{ url_for('codigoqr') }}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div >
-                <input type="file" name ="image" id="fileInput"  class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
+            <div>
+                <input type="file" name="imagen" id="fileInput" class="rounded mx-auto d-block border col-5 mb-2 img-fluid" accept="image/*" onchange="viewimage(event)">
             </div>
-            <div id="imagePreview" class="d-flex justify-content-center" style="width="5%"">
-                
+            <div id="imagePreview" class="d-flex justify-content-center mx-auto img-fluid" style="width:5%"></div>
+            <div class="mb-3">
+                <input type="text" name="nombremascota" placeholder="Nombre mascota:" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" required autofocus>
             </div>
             <div class="mb-3">
-                <input type="text" name="nombremascota" placeholder="Nombre_mascota" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="text" name="edad" placeholder="Edad:" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" pattern="\d{1,}" title="Ingrese un valor numerico" required>
             </div>
             <div class="mb-3">
-                <input type="text" name="edad" placeholder="Edad" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="text" name="raza" placeholder="Raza:" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" required>
             </div>
             <div class="mb-3">
-                <input type="text" name="raza" placeholder="Raza" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="date" name="fecha_nacimiento" placeholder="Fecha Nacimiento:" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" required>
             </div>
             <div class="mb-3">
-                <input type="date" name="fecha_nacimiento" placeholder="Fecha_nacimiento" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+                <input type="text" name="peso" placeholder="Peso:" autocomplete="off" class="rounded mx-auto d-block border col-5 p-1" pattern="\d{1,}" title="Ingrese un valor numerico" required>
             </div>
-            <div class="mb-3">
-                <input type="text" name="peso" placeholder="peso" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
-            </div>
-            <div class="mb-3">
-                <input type="text" name="vacunado" placeholder="vacunado" autocomplete="off" class="rounded mx-auto d-block border col-5" required>
+            <div class="mb-3 col-5 mx-auto d-flex" style="gap: 20px;">
+                <label><strong>¿Vacunado?</strong></label>
+                <select id="vacunado" name="vacunado" class="rounded border" required>
+                    <option>Si</option>
+                    <option>No</option>
+                </select>
             </div>
             <div class="mb-3">
                 <button type="submit" class="rounded mx-auto d-block border col-3">Registrar</button>
+            </div>
+            <div>
+                <button type="button" class="rounded mx-auto d-block border col-3">
+                    <a href="{{ url_for('main') }}" class="text-decoration-none text-dark">Cancelar Registro</a>
+                </button>
             </div>
         </form>
     </div>
@@ -63,3 +68,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
+

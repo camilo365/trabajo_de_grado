@@ -1,17 +1,17 @@
-from flask import Flask, render_template, request, redirect, flash, url_for, send_file
+from flask import Flask, render_template, request, redirect, flash, url_for,send_file
 from config import Config
 import qrcode
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from flask_security import Security
+from io import BytesIO
 
 import email_token
 from DB import conexion_1, conexion_2
 import os
 import controlador_db
-from io import BytesIO
-
+from datetime import datetime
 
 # Identidades
 from src.modelos.entidades.usuario import User
@@ -65,9 +65,10 @@ def confirmar_url(token, usuario):
         if email:
             ModeloUsuario.validar_registro(conexion_1, usuario)
         else:
-            flash('El enlace de confirmación es inválido o ha expirado.', 'danger')
+            flash('El enlace de confirmación es inválido o ha expirado', 'danger')
             return redirect(url_for('login'))
     except:
+        flash('Lo sentimos, ha ocurrido un error inesperado. Por favor, inténtelo de nuevo')
         return redirect(url_for('login'))
 
     return redirect(url_for('login'))
@@ -84,29 +85,21 @@ def login():
 
                 if usuario_logiado.validado == 1: #true
 
-                    if usuario_logiado.p_completado == 1: #true
-
-                        login_user(usuario_logiado)
-                        return redirect(url_for('main'))
-
-                    else:
-                        login_user(usuario_logiado)
-                        correo = usuario_logiado.correo
-                        return redirect(url_for('completar_registro', correo=correo))
-
+                    login_user(usuario_logiado)
+                    return redirect(url_for('main'))
+                
                 else:
                     flash("Debe verificar su cuenta. Para poder iniciar sesión")
                     return render_template('login.html')
-                    
 
-            elif usuario_logiado.contraseña_hash is not True:
+            else:
                 flash("Contraseña incorrecta.")
                 return render_template('login.html')
 
         else:
             flash('El usuario no se encuentra registrado.')
             return render_template('login.html')
-        
+
     #si la petición es GET
     else:
         return render_template('login.html')
@@ -123,16 +116,17 @@ def codigoqr():
         raza = request.form['raza']
         fecha_nacimiento = request.form['fecha_nacimiento']
         peso = request.form['peso']
-        vacunado = request.form['vacunado']
+        vacunado = 1 if request.form.get('vacunado') == 'Si' else '0'
+        imagen = request.files.get('imagen')
+        
+        if not imagen or imagen.filename == '':
+            flash("Se requiere una imagen.")
+            return render_template('agregarmascota.html')
 
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
-            #Agregar la función para guardar la información en la base datos
+            imagen_binario = imagen.read()
 
-            id_usuario = ModeloUsuario.obtener_info_usuario(conexion_2, current_user.correo)
-            
-            
-            if id_usuario is not None: #Guardar la mascota en la base de datos
-                ModeloMascota.ingresar_mascota(conexion_2, id_usuario, nombremascota, edad, raza, fecha_nacimiento, peso, vacunado)
+            ModeloMascota.ingresar_mascota(conexion_2, current_user.identificacion, nombremascota, edad, raza, fecha_nacimiento, peso, int(vacunado),imagen_binario)
 
             """ generar la url con los datos dinamicamente """
             data_url = url_for('mostrar_datos', 
@@ -159,31 +153,25 @@ def codigoqr():
 
             # Generar la URL para la imagen
             img_url = url_for('static', filename=f'qrcodes/{nombremascota}.png')
-            mascotas = ModeloMascota.mascotas_datos(conexion_2, id_usuario)
+            mascotas = ModeloMascota.mascotas_datos(conexion_2, current_user.identificacion)
             return render_template('main.html', 
-                                   img_url=img_url, 
-                                   nombremascota=nombremascota, 
-                                   edad=edad, 
-                                   raza=raza, 
-                                   fecha_nacimiento=fecha_nacimiento, 
-                                   peso=peso, 
-                                   vacunado=vacunado,
-                                   mascotas=mascotas
-                                   )
+                                    img_url=img_url, 
+                                    nombremascota=nombremascota, 
+                                    edad=edad, 
+                                    raza=raza, 
+                                    fecha_nacimiento=fecha_nacimiento, 
+                                    peso=peso, 
+                                    vacunado=vacunado,
+                                    mascotas=mascotas
+                                    )
 
-            """ Guarda la imagen en un buffer de memoria""" 
-            """ img_io = BytesIO()
-            img.save(img_io, 'PNG')
-            img_io.seek(0)
-
-            return send_file(img_io, mimetype='image/png') """
-            
         else:
             flash("Todos los campos son obligatorios")
             return render_template('agregarmascota.html')
 
     else:
         return render_template('agregarmascota.html')
+
 
 @app.route('/registrar', methods=['POST', 'GET'])
 def registrar():
@@ -206,26 +194,32 @@ def registrar():
 
         else:
             identificacion = request.form['identificacion']
+            nombre = request.form['nombre']
+            apellido = request.form['apellido']
+            edad = request.form['edad']
             celular = request.form['celular']
             usuario = request.form['usuario_registrar']
             correo = request.form['email']
             salt = User.salt()
-            credenciales = User(identificacion=identificacion, celular=celular, usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
 
-            if email_token.enviar_correo_confirmacion(mail, Config.SECRET_KEY, Config.SECURITY_PASSWORD_SALT, usuario=usuario, correo=correo):
-                flash('Usuario registrado exitosamente. Se envio un enlace de confirmación a su correo')
-                ModeloUsuario.registrar_usuario(conexion_1, credenciales) 
-                return redirect(url_for('login'))
+            credenciales = User(identificacion=identificacion, nombre=nombre, apellido=apellido, edad=edad, celular=celular, usuario=usuario, correo=correo, contraseña_hash=User.incriptar(request.form['password_registrar'], salt), salt=salt)
+
+            #Para actuvar la funcion de confirmar registro : #Descomentar la lineas 201 y 202. Las lineas 203 y 204 deben de estar dentro del if.
+
+            #if email_token.enviar_correo_confirmacion(mail, Config.SECRET_KEY, Config.SECURITY_PASSWORD_SALT, usuario=usuario, correo=correo):
+                #flash('Usuario registrado exitosamente. Se envio un enlace de confirmación a su correo')
+            ModeloUsuario.registrar_usuario(conexion_1, credenciales) 
+            return redirect(url_for('login'))
             
-            else:
+        """  else:
                 flash('Ocurrio un error inesperado. Intentelo de nuevo')
-                return redirect(url_for('index'))
+                return redirect(url_for('index')) """
 
     #Si la petición es GET
     else:
         return render_template('registrar.html')
 
-@app.route('/completar_registro/<correo>/', methods=['POST', 'GET'])
+""" @app.route('/completar_registro/<correo>/', methods=['POST', 'GET'])
 def completar_registro(correo):
     if request.method == 'POST':
         identificacion = request.form['identificacion']
@@ -240,7 +234,7 @@ def completar_registro(correo):
 
     else:
         flash('Complete todos los campos para poder continuar', 'danger')
-        return render_template('completar_registro.html', correo=correo)
+        return render_template('completar_registro.html', correo=correo) """
 
 @app.route('/restablecer/<token>/<correo>/', methods=['POST', 'GET'])
 def restablecer_contraseña(token, correo):
@@ -252,7 +246,7 @@ def restablecer_contraseña(token, correo):
             flash('El enlace de confirmación es inválido o ha expirado.', 'danger')
             return redirect(url_for('login'))
     except:
-        flash('Ocurrio un error inexperado. Intentelo de nuevo', 'danger')
+        flash('Ocurrio un error inesperado. Intentelo de nuevo', 'danger')
         return redirect(url_for('login'))
 
 @app.route('/cambiar', methods=['POST'])
@@ -264,26 +258,25 @@ def cambiar_contraseña():
         ModeloUsuario.cambiar_contraseña(conexion_1, contraseña, correo)
         flash('Contraseña cambiada satisfactoriamente', 'succes')
         return redirect(url_for('login'))
+
     except:
-        flash('Ocurrio un error inexperado intentelo de nuevo', 'danger')
+        flash('Lo sentimos, ha ocurrido un error inesperado. Por favor, inténtelo de nuevo')
         return redirect(url_for('login'))
 
 """este se utiliza para mostrar los datos en la plantilla mostrardatos y este es el que va a ver la
 persona cuando escanee el codigo"""
 
-
 @app.route('/mostrardatos', methods=['GET','POST'])
 @login_required
 def mostrar_datos():
     """ se puede manejar de esta forma o de la otra de arriba como diccionario """
-    
+
     nombremascota = request.args.get('nombremascota')
     edad = request.args.get('edad')
     raza = request.args.get('raza')
     fecha_nacimiento = request.args.get('fecha_nacimiento')
     peso = request.args.get('peso')
     vacunado = request.args.get('vacunado')
-    
 
     return render_template('mostrardatos.html', 
                             nombremascota=nombremascota, 
@@ -300,17 +293,16 @@ def main():
     try:
         # Obtener el ID del usuario actual
         id_usuario = current_user.identificacion
-        print(id_usuario)
+
         # Obtener todas las mascotas asociadas al usuario actual
-        mascotas = ModeloMascota.mascotas_datos(conexion_2,id_usuario)
-        
+        mascotas = ModeloMascota.mascotas_datos(conexion_2, id_usuario)
+
         # Pasar los datos de las mascotas a la plantilla
         return render_template('main.html', mascotas=mascotas)
     
     except Exception as e:
         flash(str(e))
         return render_template('main.html', mascotas=[])
-
 
 @app.route('/cerrar_sesion')
 @login_required
@@ -319,21 +311,52 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route('/eliminar', methods=['POST'])
+@login_required
 def eliminar():
     if 'id' in request.form:
         id = int(request.form['id'])
         id_usuario = current_user.identificacion
-        print(id)
-        eliminar = ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
-        print(eliminar)
+
+        ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
     return redirect(url_for('main')) # Otra acción a realizar después de eliminar la mascota
 
-@app.route('/editar', methods=['POST'])
+@app.route('/editar_familiar', methods=['POST'])
+@login_required
 def editar():
-    if 'id' in request.form:
-        print("bienvenido")
-    return redirect(url_for('main'))
+    id_mascota = int(request.form['id'])
+    mascota = ModeloMascota.cargar_datos_mascota(conexion_2, current_user.identificacion, id_mascota)
 
+    return render_template('editar_familiar.html', mascota=mascota, id_mascota=id_mascota)
+
+@app.route('/confirmar_editar_mascota', methods=['POST'])
+@login_required
+def confirmar_editar_mascota():
+    try:
+        id_mascota = int(request.form['id'])
+        imagen = request.form['image']
+        nombre_mascota = request.form['nombremascota']
+        edad = int(request.form['edad'])
+        raza = request.form['raza']
+        fecha_nacimiento = datetime.strptime(request.form['fecha_nacimiento'], "%Y-%m-%d").date()
+        #datetime.strptime(request.form['fecha_nacimiento'], "%Y-%m-%d").date() Nesecario para Convertir la fecha a un objeto datetime.date
+        peso = int(request.form['peso'])
+        vacunado = 1 if request.form.get('vacunado') == 'Si' else 0
+
+        nuevos_datos = (nombre_mascota, edad, raza, fecha_nacimiento, peso, vacunado)
+
+        #Cargar los datos de la mascota(en base al id) desde la base de datos
+        datos_almacenados = ModeloMascota.cargar_datos_mascota(conexion_2, current_user.identificacion, id_mascota)
+
+        #Actualizar los datos de la mascota en la base de datos
+        ModeloMascota.actualizar_mascota(conexion_2, datos_almacenados, nuevos_datos, id_mascota)
+
+        print(imagen)
+
+        return redirect(url_for('main'))
+    
+    except:
+        flash('Lo sentimos, ha ocurrido un error inesperado. Por favor, inténtelo de nuevo')
+        return redirect(url_for('main'))
 
 if __name__ == '__main__':
     csrf.init_app(app)

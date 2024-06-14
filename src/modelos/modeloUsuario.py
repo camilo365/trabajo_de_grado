@@ -7,13 +7,16 @@ class ModeloUsuario():
         try:
             conexion = db()
             cursor = conexion.cursor()
-            cursor.execute("SELECT id, identificacion, celular, usuario, correo, validado, contraseña_hash, salt, p_completado FROM credenciales WHERE usuario=%s", (user.usuario,))
+            cursor.execute("SELECT id, identificacion, nombre, apellido, edad, celular, usuario, correo, validado, contraseña_hash, salt FROM credenciales WHERE usuario=%s", (user.usuario,))
+
+            #identificacion=None, nombre=None, apellido=None, edad=None, celular=None, usuario=None, correo=None, validado=0, contraseña_hash=None,  salt=None
+
             datos = cursor.fetchone()
             conexion.close()
             cursor.close()
 
             if datos is not None:
-                return User(id=datos[0], identificacion=datos[1], celular=datos[2], usuario=datos[3], correo=datos[4], validado=datos[5], contraseña_hash=User.validar_contrasena(datos[6], user.contraseña_hash + datos[7]), p_completado=datos[8])
+                return User(id=datos[0], identificacion=datos[1], nombre=datos[2], apellido=datos[3], edad=datos[4], celular=datos[5], usuario=datos[6], correo=datos[7], validado=datos[8], contraseña_hash=User.validar_contrasena(datos[9], user.contraseña_hash + datos[10]))
             else:
                 return None
             
@@ -50,14 +53,7 @@ class ModeloUsuario():
             conexion = db()
 
             cursor = conexion.cursor()
-            print(user.identificacion)
-            print(user.usuario)
-            print(user.correo)
-            print(user.validado)
-            print(user.contraseña_hash)
-            print(user.salt)
-            print(user.p_completado)
-            cursor.execute("INSERT INTO credenciales(identificacion, celular, usuario, correo, validado, contraseña_hash, salt, p_completado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (user.identificacion, user.celular, user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt, user.p_completado))
+            cursor.execute("INSERT INTO credenciales(identificacion, nombre, apellido, edad, celular, usuario, correo, validado, contraseña_hash, salt) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (user.identificacion, user.nombre, user.apellido, user.edad, user.celular, user.usuario, user.correo, user.validado, user.contraseña_hash, user.salt))
             cursor.close()
 
             conexion.commit()
@@ -73,21 +69,21 @@ class ModeloUsuario():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT id, identificacion, usuario, correo FROM credenciales WHERE id=%s", (id,))
+            cursor.execute("SELECT id, identificacion, nombre, apellido, usuario, correo FROM credenciales WHERE id=%s", (id,))
             datos = cursor.fetchone()
             
             conexion.close()
             cursor.close()
 
             if datos is not None:
-                return User(id=datos[0], identificacion=datos[1], usuario=datos[2], correo=datos[3])
+                return User(id=datos[0], identificacion=datos[1], nombre=datos[2], apellido=datos[3],  usuario=datos[4], correo=datos[5])
             else:
                 return None
             
         except Exception as ex:
             raise Exception(ex)
 
-    @classmethod
+    """ @classmethod
     def obtener_info_usuario(self, db, correo_usuario):
         try:
             conexion = db()
@@ -106,7 +102,7 @@ class ModeloUsuario():
                 return None
 
         except Exception as ex:
-            raise Exception(ex)
+            raise Exception(ex) """
 
     @classmethod
     def obtener_correo_usuario(self, db, correo): #Verificar si el correo existe
@@ -129,7 +125,7 @@ class ModeloUsuario():
             raise Exception(ex)
 
     @classmethod
-    def validar_registro(self, db, usuario): #Función para validar el usuario en la base de datos(el usuario valido el correo de confirmación)
+    def validar_registro(self, db, usuario): #Función para validar el usuario en la base de datos(el usuario a valido el correo de confirmación)
         """ Valida el usuario en la base de datos """
 
         try:
@@ -145,9 +141,8 @@ class ModeloUsuario():
         except Exception as ex:
             raise Exception(ex)
 
-    @classmethod
+    """ @classmethod
     def validar_p_completado(self, db, correo): #Función para validar que el usuario completo su perfil
-        """ Valida Que el usuario haya completado su registro """
 
         try:
             conexion = db()
@@ -160,7 +155,7 @@ class ModeloUsuario():
             cursor.close()
 
         except Exception as ex:
-            raise Exception(ex)
+            raise Exception(ex) """
         
     @classmethod
     def cambiar_contraseña(self, db, contraseña, correo):
