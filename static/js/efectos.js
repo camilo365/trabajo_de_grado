@@ -11,7 +11,7 @@ function viewimage(event) {
     var reader = new FileReader();
     reader.onload = function(){
         var output = document.getElementById('imagePreview');
-        output.innerHTML = '<img src="'+reader.result+'" alt="Vista previa de la imagen" style="max-width: 300px;">';
+        output.innerHTML = '<img src="'+reader.result+'" alt="Vista previa de la imagen" class="rounded mx-auto d-block col-5 mb-3" style="width: 200px; height: 200px;">';
     };
     reader.readAsDataURL(event.target.files[0]);
 }

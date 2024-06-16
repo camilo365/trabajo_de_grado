@@ -27,12 +27,12 @@
         
             {% endif %}
         {% endwith %}
-        <form action="{{url_for('codigoqr')}}" method="post">
+        <form action="{{url_for('codigoqr')}}" enctype="multipart/form-data" method="post" >
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div >
-                <input type="file" name="image" id="fileInput"  class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
+                <input type="file" name="image" id="fileInput" class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
             </div>
-            <div id="imagePreview" class="d-flex justify-content-center" style="width:5%">
+            <div id="imagePreview" >
                 
             </div>
             <div class="mb-3">

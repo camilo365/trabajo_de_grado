@@ -9,7 +9,6 @@ from flask_security import Security
 import email_token
 from DB import conexion_1, conexion_2
 import os
-import controlador_db
 from datetime import datetime
 
 # Identidades
@@ -111,6 +110,7 @@ redirecciona a las personas a la plantilla mostrardatos que es donde van a estar
 def codigoqr():
     if request.method == 'POST':
         nombremascota = request.form['nombremascota']
+        imagen = request.files['image'] #Obtener la imagen
         edad = request.form['edad']
         raza = request.form['raza']
         fecha_nacimiento = request.form['fecha_nacimiento']
@@ -119,9 +119,12 @@ def codigoqr():
 
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
 
-            ModeloMascota.ingresar_mascota(conexion_2, current_user.identificacion, nombremascota, edad, raza, fecha_nacimiento, peso, int(vacunado))
+            #Convertir la imagen en binario para poder guardarla en la base de datos
+            imagen_binaria = imagen.read()
 
-            """ generar la url con los datos dinamicamente """
+            ModeloMascota.ingresar_mascota(conexion_2, current_user.identificacion, nombremascota, edad, raza, fecha_nacimiento, peso, int(vacunado), imagen_binaria) 
+
+            #generar la url con los datos dinamicamente 
             data_url = url_for('mostrar_datos', 
                                 nombremascota=nombremascota,
                                 edad=edad,
@@ -211,23 +214,6 @@ def registrar():
     else:
         return render_template('registrar.html')
 
-""" @app.route('/completar_registro/<correo>/', methods=['POST', 'GET'])
-def completar_registro(correo):
-    if request.method == 'POST':
-        identificacion = request.form['identificacion']
-        nombre = request.form['nombre']
-        apellido = request.form['apellido']
-        edad = request.form['edad']
-        correo = request.form['correo']
-
-        controlador_db.agregar_info_usuario(conexion_2, identificacion, correo, nombre, apellido, edad)
-        ModeloUsuario.validar_p_completado(conexion_1, correo) #consulta para modificar la variable : p_completado.
-        return redirect(url_for('main'))
-
-    else:
-        flash('Complete todos los campos para poder continuar', 'danger')
-        return render_template('completar_registro.html', correo=correo) """
-
 @app.route('/restablecer/<token>/<correo>/', methods=['POST', 'GET'])
 def restablecer_contraseña(token, correo):
     try:
@@ -285,6 +271,7 @@ def main():
     try:
         # Obtener el ID del usuario actual
         id_usuario = current_user.identificacion
+        
 
         # Obtener todas las mascotas asociadas al usuario actual
         mascotas = ModeloMascota.mascotas_datos(conexion_2, id_usuario)
@@ -305,12 +292,37 @@ def logout():
 @app.route('/eliminar', methods=['POST'])
 @login_required
 def eliminar():
-    if 'id' in request.form:
-        id = int(request.form['id'])
-        id_usuario = current_user.identificacion
+    try:
+        if 'id' in request.form:
+            id = int(request.form['id'])
+            id_usuario = current_user.identificacion
 
-        ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
-    return redirect(url_for('main')) # Otra acción a realizar después de eliminar la mascota
+            nombre_mascota = ModeloMascota.obtener_nombre_mascota(conexion_2, id)
+            ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
+        
+            #ruta_img = os.path.join('static', 'mascotas_img', f'{id}.jpg')
+            ruta_qr = os.path.join('static', 'qrcodes', f'{nombre_mascota}.png')
+
+            ruta_img = 'static\\mascotas_img' # Ruta de las carpetas donde se almacenan las imagenes de las mascotas
+
+            # Recorrer todos los archivos del directorio
+            for root, dirs, files in os.walk(ruta_img):
+                for file in files:
+                    if file.startswith(f'{id}'):
+                        file_path = os.path.join(root, file)
+                        break  
+
+            if os.path.exists(ruta_qr) and os.path.exists(ruta_img):
+                os.remove(file_path) #Eliminar QR de la mascota
+                os.remove(ruta_qr) #Eliminar Imagen de la mascota
+
+                return redirect(url_for('main'))
+
+            else:
+                raise     
+    except:
+        flash('Error al intentar eliminar mascota. Intentelo de nuevo')
+        return redirect(url_for('main')) # Otra acción a realizar después de eliminar la mascota
 
 @app.route('/editar_familiar', methods=['POST'])
 @login_required
@@ -323,9 +335,15 @@ def editar():
 @app.route('/confirmar_editar_mascota', methods=['POST'])
 @login_required
 def confirmar_editar_mascota():
-    try:
+    #Agregar la clausura, try-except
+
         id_mascota = int(request.form['id'])
-        imagen = request.form['image']
+
+        if 'image' not in request.files:
+            imagen = None
+        else:
+            imagen = request.files['image'].read() #Convertir la imagen en binario
+    
         nombre_mascota = request.form['nombremascota']
         edad = int(request.form['edad'])
         raza = request.form['raza']
@@ -334,7 +352,7 @@ def confirmar_editar_mascota():
         peso = int(request.form['peso'])
         vacunado = 1 if request.form.get('vacunado') == 'Si' else 0
 
-        nuevos_datos = (nombre_mascota, edad, raza, fecha_nacimiento, peso, vacunado)
+        nuevos_datos = (nombre_mascota, edad, raza, fecha_nacimiento, peso, vacunado, imagen)
 
         #Cargar los datos de la mascota(en base al id) desde la base de datos
         datos_almacenados = ModeloMascota.cargar_datos_mascota(conexion_2, current_user.identificacion, id_mascota)
@@ -342,13 +360,8 @@ def confirmar_editar_mascota():
         #Actualizar los datos de la mascota en la base de datos
         ModeloMascota.actualizar_mascota(conexion_2, datos_almacenados, nuevos_datos, id_mascota)
 
-        print(imagen)
+        return redirect(url_for('main'))
 
-        return redirect(url_for('main'))
-    
-    except:
-        flash('Lo sentimos, ha ocurrido un error inesperado. Por favor, inténtelo de nuevo')
-        return redirect(url_for('main'))
 
 if __name__ == '__main__':
     csrf.init_app(app)

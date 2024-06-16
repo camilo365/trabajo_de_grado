@@ -10,7 +10,7 @@
 <body>
     <div class="fondo-color">
         <div>
-            <img src="{{ url_for('static', filename='imagenes/idpets.svg')}}" class="img-fluid rounded mx-auto d-block p-2" alt="Logo Id Pets">
+            <img src="{{ url_for('static', filename='imagenes/idpets.svg') }}" class="img-fluid rounded mx-auto d-block p-2" alt="Logo Id Pets">
         </div>
         <!-- ALERT para mostrar si hay un error -->
         {% with messages = get_flashed_messages() %}
@@ -28,15 +28,17 @@
             {% endif %}
         {% endwith %}
 
-        <form action="{{url_for('confirmar_editar_mascota')}}" method="post">
+        <form action="{{url_for('confirmar_editar_mascota')}}" enctype="multipart/form-data" method="post">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="id" value="{{ id_mascota }}">
             <div >
-                <input type="file" name="image" id="fileInput"  class="rounded mx-auto d-block border col-5 mb-2" accept="image/*" onchange="viewimage(event)">
+                <input type="file" name="image" id="fileInput" class="rounded mx-auto d-block border col-5 mb-2"  accept="image/*" onchange="viewimage(event)">
             </div>
-            <div id="imagePreview" class="d-flex justify-content-center" style="width:5%">
 
+            <div id="imagePreview" class="img-fluid rounded mx-auto d-block p-2">
+                <img src="{{ url_for('static', filename=mascota[6]) }}" class="rounded mx-auto d-block col-5 mb-3" style="width: 200px; height: 200px;" alt="imagen mascota">
             </div>
+
             <div class="mb-3">
                 <label for="input1" class="mx-auto d-block col-5 mb-1">Nombre : </label>
                 <input type="text" name="nombremascota" autocomplete="off" class="rounded mx-auto d-block col-5 border p-1" id="input1" value="{{ mascota[0] }}" required autofocus>

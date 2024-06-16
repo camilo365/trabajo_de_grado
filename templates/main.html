@@ -13,8 +13,22 @@
             <!--<form action="{{ url_for('main') }}" method="get">-->
             <h1 class="d-flex justify-content-center">¡Hola, {{ current_user.nombre }}!</h1>
             <div class="modal-foto mx-auto rounded">
-                <p>{{ datos }}</p>
             </div>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            
+                {% for message in messages %}
+                <div class="container text-center">
+                    <div class="alert alert-warning alert-dismissible fade show p-2 d-flex" role="alert">
+                        <strong class="text-dark"> {{ message }} </strong>
+                        <button type="button" class="btn-close pb-1" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </div>
+                {% endfor %}
+            
+                {% endif %}
+            {% endwith %}
+
             <div class="d-flex justify-content-center">
                 <input type="submit" id="ventanaagregar" name="añadir integrante a la familia" value="Añadir integrante a la familia">
             </div>
@@ -49,7 +63,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <img src="{{  }}" class="img-fluid" alt="Mascota">
+                                        <img src="{{ url_for('static', filename=mascota[8]) }}" class="img-fluid" alt="Mascota">
                                     </div>
                                     <div class="col-md-8">
                                         <div class="table-responsive">
@@ -107,6 +121,8 @@
                                                             <input type="hidden" name="id" value="{{ mascota[0] }}">
                                                             <td><input type="submit" class="btn btn-success editar"value="editar"></td>
                                                         </form>
+
+                                                        
                                                     </tr>                                                    
                                                     
                                                 </tbody>
@@ -126,6 +142,7 @@
             </button>
         </div>
     </div>
+
     
     <script src="{{ url_for('static', filename='js/efectos.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
