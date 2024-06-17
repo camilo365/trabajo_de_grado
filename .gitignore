@@ -3,10 +3,13 @@ env/
 __pycache__/
 src/modelos/__pycache__/
 src/modelos/entidades/__pycache__/
+
+#Carpetas de las imagenes y codigos QR
 static/qrcodes/
+static/imagenes/
+static/mascotas_img/
 
 dict.py
-static/imagenes/
 Requirements.txt
 API_KEY.py
 DB_codigo.txt

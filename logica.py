@@ -30,7 +30,10 @@ login_manager_app.login_view = 'login'
 
 @login_manager_app.user_loader
 def load_user(id):
-    return ModeloUsuario.obtener_usuario(conexion_1, id)
+    try:
+        return ModeloUsuario.obtener_usuario(conexion_1, id)
+    except:
+        None
 
 @app.route('/')
 @app.route('/index')
@@ -73,34 +76,40 @@ def confirmar_url(token, usuario):
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method == 'POST':
-        user = User(usuario=request.form['usuario'], contraseña_hash=request.form['contraseña'])
-        usuario_logiado = ModeloUsuario.login(conexion_1, user)
+    try:
+        if request.method == 'POST':
+            user = User(usuario=request.form['usuario'], contraseña_hash=request.form['contraseña'])
+            usuario_logiado = ModeloUsuario.login(conexion_1, user)
 
-        if usuario_logiado is not None:
+            if usuario_logiado is not None:
 
-            if usuario_logiado.contraseña_hash:
+                if usuario_logiado.contraseña_hash:
 
-                if usuario_logiado.validado == 1: #true
+                    if usuario_logiado.validado == 1: #true
 
-                    login_user(usuario_logiado)
-                    return redirect(url_for('main'))
-                
+                        login_user(usuario_logiado)
+                        return redirect(url_for('main'))
+                    
+                    else:
+                        flash("Debe verificar su cuenta. Para poder iniciar sesión")
+                        return render_template('login.html')
+
                 else:
-                    flash("Debe verificar su cuenta. Para poder iniciar sesión")
+                    flash("Contraseña incorrecta.")
                     return render_template('login.html')
 
             else:
-                flash("Contraseña incorrecta.")
+                flash('El usuario no se encuentra registrado.')
                 return render_template('login.html')
 
+        #si la petición es GET
         else:
-            flash('El usuario no se encuentra registrado.')
             return render_template('login.html')
 
-    #si la petición es GET
-    else:
-        return render_template('login.html')
+    except:
+        flash('No puedo se puede iniciar sesión en estos momentos. Intentelo de nuevo mas tarde')
+        return redirect(url_for('login'))
+
 
 """Este se encarga de traer los valores de la plantilla agregar mascota y genera el codigo QR que al ser escaneado 
 redirecciona a las personas a la plantilla mostrardatos que es donde van a estar los datos de forma organizada"""
@@ -300,7 +309,7 @@ def eliminar():
             nombre_mascota = ModeloMascota.obtener_nombre_mascota(conexion_2, id)
             ModeloMascota.eliminar_mascota(conexion_2, id, id_usuario)
         
-            #ruta_img = os.path.join('static', 'mascotas_img', f'{id}.jpg')
+            #Eliminar la imagen y el codigo QR
             ruta_qr = os.path.join('static', 'qrcodes', f'{nombre_mascota}.png')
 
             ruta_img = 'static\\mascotas_img' # Ruta de las carpetas donde se almacenan las imagenes de las mascotas
@@ -361,6 +370,28 @@ def confirmar_editar_mascota():
         ModeloMascota.actualizar_mascota(conexion_2, datos_almacenados, nuevos_datos, id_mascota)
 
         return redirect(url_for('main'))
+
+#Manejar errores HTPP
+#404
+@app.errorhandler(404)
+def pagina_no_encontrada(e):
+    return render_template('Errores/404.html'), 404
+
+#Erroes del servidor(500 en adelante)
+@app.errorhandler(500)
+@app.errorhandler(501)
+@app.errorhandler(502)
+@app.errorhandler(503)
+@app.errorhandler(504)
+@app.errorhandler(505)
+@app.errorhandler(506)
+@app.errorhandler(507)
+@app.errorhandler(508)
+@app.errorhandler(510)
+@app.errorhandler(511)
+@app.errorhandler(520)
+def error_500(e):
+    return render_template('Errores/500.html', codigo=e.code, codigo_descipcion=e.description), e.code
 
 
 if __name__ == '__main__':

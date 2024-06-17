@@ -9,8 +9,6 @@ class ModeloUsuario():
             cursor = conexion.cursor()
             cursor.execute("SELECT id, identificacion, nombre, apellido, edad, celular, usuario, correo, validado, contraseña_hash, salt FROM credenciales WHERE usuario=%s", (user.usuario,))
 
-            #identificacion=None, nombre=None, apellido=None, edad=None, celular=None, usuario=None, correo=None, validado=0, contraseña_hash=None,  salt=None
-
             datos = cursor.fetchone()
             conexion.close()
             cursor.close()
