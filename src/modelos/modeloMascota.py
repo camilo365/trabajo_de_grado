@@ -158,8 +158,6 @@ class ModeloMascota():
     @classmethod
     def guardar_nueva_imagen(self, db, imagen, id_mascota):
 
-        print(imagen)
-        print('Id mascota:', id_mascota)
         ruta_img = 'static\\mascotas_img' # Ruta de las carpetas donde se almacenan las imagenes de las mascotas
 
         for root, dirs, files in os.walk(ruta_img):

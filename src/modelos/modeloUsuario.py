@@ -67,14 +67,14 @@ class ModeloUsuario():
             conexion = db()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT id, identificacion, nombre, apellido, usuario, correo FROM credenciales WHERE id=%s", (id,))
+            cursor.execute("SELECT id, identificacion, nombre, apellido, celular, usuario, correo FROM credenciales WHERE id=%s", (id,))
             datos = cursor.fetchone()
             
             conexion.close()
             cursor.close()
 
             if datos is not None:
-                return User(id=datos[0], identificacion=datos[1], nombre=datos[2], apellido=datos[3],  usuario=datos[4], correo=datos[5])
+                return User(id=datos[0], identificacion=datos[1], nombre=datos[2], apellido=datos[3], celular=datos[4],  usuario=datos[5], correo=datos[6])
             else:
                 return None
             
