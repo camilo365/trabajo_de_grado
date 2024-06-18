@@ -9,6 +9,7 @@ static/qrcodes/
 static/imagenes/
 static/mascotas_img/
 
+static/qrcodes/
 dict.py
 Requirements.txt
 API_KEY.py

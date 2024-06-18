@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for,send_file
 from config import Config
 import qrcode
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from flask_security import Security
+from io import BytesIO
 
 import email_token
 from DB import conexion_1, conexion_2
@@ -126,6 +127,7 @@ def codigoqr():
         fecha_nacimiento = request.form['fecha_nacimiento']
         peso = request.form['peso']
         vacunado = 1 if request.form.get('vacunado') == 'Si' else '0'
+        
 
         if nombremascota and edad and raza and fecha_nacimiento and peso and vacunado:
 
@@ -177,6 +179,7 @@ def codigoqr():
 
     else:
         return render_template('agregarmascota.html')
+
 
 @app.route('/registrar', methods=['POST', 'GET'])
 def registrar():
