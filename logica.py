@@ -35,6 +35,7 @@ def load_user(id):
     except:
         None
 
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -344,14 +345,8 @@ def editar():
 @app.route('/confirmar_editar_mascota', methods=['POST'])
 @login_required
 def confirmar_editar_mascota():
-    #Agregar la clausura, try-except
 
         id_mascota = int(request.form['id'])
-
-        if 'image' not in request.files:
-            imagen = None
-        else:
-            imagen = request.files['image'].read() #Convertir la imagen en binario
     
         nombre_mascota = request.form['nombremascota']
         edad = int(request.form['edad'])
@@ -361,7 +356,7 @@ def confirmar_editar_mascota():
         peso = int(request.form['peso'])
         vacunado = 1 if request.form.get('vacunado') == 'Si' else 0
 
-        nuevos_datos = (nombre_mascota, edad, raza, fecha_nacimiento, peso, vacunado, imagen)
+        nuevos_datos = (nombre_mascota, edad, raza, fecha_nacimiento, peso, vacunado)
 
         #Cargar los datos de la mascota(en base al id) desde la base de datos
         datos_almacenados = ModeloMascota.cargar_datos_mascota(conexion_2, current_user.identificacion, id_mascota)
@@ -371,6 +366,30 @@ def confirmar_editar_mascota():
 
         return redirect(url_for('main'))
 
+@app.route('/cambiar_imagen', methods=['GET', 'POST'])
+def cambiar_imagen():
+    if request.method == 'POST':
+
+        imagen = request.form['imagen']
+        id_mascota = request.form['id']
+        return render_template('cambiar_imagen.html', imagen=imagen, id_mascota=id_mascota)
+    
+@app.route('/guardar_imagen', methods=['POST'])
+def guardar_imagen():
+
+    archivo = request.files['archivo']
+    id_mascota = request.form['id']
+
+    if 'archivo' in request.files: 
+        if archivo.filename != '':
+            imagen = request.files['archivo'].read()
+            ModeloMascota.guardar_nueva_imagen(conexion_2, imagen, id_mascota)
+            flash('IMAGEN ACTULIZADA')
+        else:
+            imagen = None
+
+    return redirect(url_for('main'))
+
 #Manejar errores HTPP
 #404
 @app.errorhandler(404)
@@ -379,17 +398,6 @@ def pagina_no_encontrada(e):
 
 #Erroes del servidor(500 en adelante)
 @app.errorhandler(500)
-@app.errorhandler(501)
-@app.errorhandler(502)
-@app.errorhandler(503)
-@app.errorhandler(504)
-@app.errorhandler(505)
-@app.errorhandler(506)
-@app.errorhandler(507)
-@app.errorhandler(508)
-@app.errorhandler(510)
-@app.errorhandler(511)
-@app.errorhandler(520)
 def error_500(e):
     return render_template('Errores/500.html', codigo=e.code, codigo_descipcion=e.description), e.code
 

@@ -112,39 +112,17 @@ class ModeloMascota():
             conexion = db()
             cursor = conexion.cursor()
 
-            if not nuevos_datos[6]:
+            columnas = ("nombre", "edad", "raza", "fecha_nacimiento", "peso", "vacunado")
 
-                print('sin imagen')
-                datos_mascota_nuevos = list(nuevos_datos) #Nuevos datos
-                datos_mascota_guardados = list(datos_actuales) #Datos almacenados
+            valores_actuales = dict(zip(columnas, datos_actuales))
+    
+            nuevos_valores = dict(zip(columnas, nuevos_datos))
 
-                datos_mascota_nuevos.pop()    #Eliminar el ultimo valor (la imagen)
-                datos_mascota_guardados.pop() #Eliminar el ultimo valor (la imagen)
-
-                columnas = ("nombre", "edad", "raza", "fecha_nacimiento", "peso", "vacunado")
-
-                valores_actuales = dict(zip(columnas, datos_mascota_nuevos))
-        
-                nuevos_valores = dict(zip(columnas, datos_mascota_guardados))
-
-            else:
-                datos_mascota_nuevos = list(nuevos_datos) #Nuevos datos
-                datos_mascota_guardados = list(datos_actuales) #Datos almacenados
-
-                columnas = ("nombre", "edad", "raza", "fecha_nacimiento", "peso", "vacunado", "imagen")
-
-                valores_actuales = dict(zip(columnas, datos_mascota_guardados))
-        
-                nuevos_valores = dict(zip(columnas, datos_mascota_nuevos))
-
-            # Filtrar solo los campos que han cambiado
             campos_a_actualizar = {k: nuevos_valores[k] for k, v in valores_actuales.items() if nuevos_valores[k] != v}
 
             set_clause = ", ".join([f"{campo}=%s" for campo in campos_a_actualizar.keys()])
             query = f"UPDATE mascotas_info SET {set_clause} WHERE id_mascota=%s"
             valores = list(campos_a_actualizar.values()) + [id_mascota]
-
-            print(query, valores)
 
             if set_clause:
                 cursor.execute(query, valores)
@@ -173,6 +151,35 @@ class ModeloMascota():
             else:
                 return None
             
+
+        except Exception as ex:
+                raise Exception(ex)
+
+    @classmethod
+    def guardar_nueva_imagen(self, db, imagen, id_mascota):
+
+        print(imagen)
+        print('Id mascota:', id_mascota)
+        ruta_img = 'static\\mascotas_img' # Ruta de las carpetas donde se almacenan las imagenes de las mascotas
+
+        for root, dirs, files in os.walk(ruta_img):
+            for file in files:
+                if file.startswith(f'{id_mascota}'):
+                    file_path = os.path.join(root, file)
+                    break 
+
+        if os.path.exists(ruta_img):
+            os.remove(file_path) #Eliminar imagen de la mascota
+        
+        try:
+            conexion = db()
+            cursor = conexion.cursor()
+
+            cursor.execute('UPDATE mascotas_info SET imagen=%s WHERE id_mascota=%s', (imagen, id_mascota))
+
+            conexion.commit()
+            cursor.close()
+            conexion.close()
 
         except Exception as ex:
                 raise Exception(ex)

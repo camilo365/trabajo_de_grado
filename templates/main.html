@@ -62,9 +62,19 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-md-4">
+
+                                    <div class="col-md-4 d-flex flex-column justify-content-between" style="height: 100%;">
                                         <img src="{{ url_for('static', filename=mascota[8]) }}" class="img-fluid" alt="Mascota">
+                                        <div class="mt-auto">
+                                            <form action="{{ url_for('cambiar_imagen') }}" method="post" class="text-center mt-2">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <input type="hidden" name="id" value="{{ mascota[0] }}">
+                                                <input type="hidden" name="imagen" value="{{ mascota[8] }}"> 
+                                                <input type="submit" class="btn btn-success editar" value="Cambiar Imagen">
+                                            </form>
+                                        </div>
                                     </div>
+                                    
                                     <div class="col-md-8">
                                         <div class="table-responsive">
                                             <table class="table table-striped">
